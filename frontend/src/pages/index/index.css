@@ -1,0 +1,23 @@
+#index {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Default to 4 columns for larger viewports */
+    grid-gap: 10px;
+}
+
+@media (max-width: 1200px) {
+    #index {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns for medium viewports */
+    }
+}
+
+@media (max-width: 900px) {
+    #index {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller viewports */
+    }
+}
+
+@media (max-width: 600px) {
+    #index {
+        grid-template-columns: 1fr; /* 1 column for very small viewports */
+    }
+}

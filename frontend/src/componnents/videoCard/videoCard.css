@@ -1,0 +1,43 @@
+#videoCard {
+    display: flex;
+    flex-direction: column;
+    width: 380px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+#videoCard img {
+    width: 380px;
+    height: 240px;
+    border-radius: 10px;
+
+}
+
+#vidInfo{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+@media (max-width: 768px) { /* Adjust the breakpoint as needed */
+    #videoCard img {
+        height: 180px;
+    }
+
+    #videoCard img,
+    #videoCard {
+        width: 320px;
+    }
+}
+
+@media (max-width: 600px) {
+    #videoCard {
+        flex-direction: row;
+    }
+    #infoContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}

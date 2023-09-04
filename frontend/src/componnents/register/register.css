@@ -1,0 +1,55 @@
+#registerForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+    padding: 8px 14px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    z-index: 3;
+    width: 390px;
+}
+
+#title {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+
+#error {
+    font-size: 16px;
+    color: rgb(210, 0, 0);
+    align-self: flex-start;
+    display: none;
+}
+
+.registerLabel {
+    align-self: flex-start;
+    font-size: 22px;
+    margin: 8px 0 4px 0;
+}
+
+.registerInput {
+    width: 380px;
+    font-size: 24px;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid black;
+}
+
+.registerBtn {
+    font-size: 20px;
+    margin: 12px 16px 8px 0;
+    padding: 2px 4px;
+    cursor: pointer;
+}
+
+.registerInfo {
+    font-size: 20px;
+}
+
+.registerInfo span {
+    text-decoration: underline;
+    cursor: pointer;
+}
