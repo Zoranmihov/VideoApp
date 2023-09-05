@@ -1,5 +1,23 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/Roboto-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('./fonts/PressStart2P-Regular.ttf');
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.robotoFont {
+font-family: 'Roboto', sans-serif;;
+}
+
+.titlesFont {
+  font-family: 'Press Start 2P', cursive, sans-serif;
 }

@@ -1,4 +1,4 @@
-#videoCard {
+.videoCard {
     display: flex;
     flex-direction: column;
     width: 380px;
@@ -6,38 +6,63 @@
     padding: 4px;
 }
 
-#videoCard img {
+.videoCard img {
     width: 380px;
     height: 240px;
     border-radius: 10px;
 
 }
 
-#vidInfo{
+.vidInfo{
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    margin-top: 8px;
+}
+
+@media (max-width: 1100px) { /* Adjust the breakpoint as needed */
+    .videoCard img {
+        width: 350px;
+    }
+
+    .videoCard {
+        width: 350px;
+    }
 }
 
 @media (max-width: 768px) { /* Adjust the breakpoint as needed */
-    #videoCard img {
+    .videoCard img {
         height: 180px;
     }
 
-    #videoCard img,
-    #videoCard {
+    .videoCard img,
+    .videoCard {
         width: 320px;
     }
 }
 
 @media (max-width: 600px) {
-    #videoCard {
+    .videoCard {
         flex-direction: row;
     }
     #infoContainer {
         display: flex;
         flex-direction: column;
         justify-content: center;
+    }
+
+    .vidInfo {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .videoCard img,
+    .videoCard {
+        width: 280px;
+    }
+    .videoCard {
+        flex-direction: column;
     }
 }

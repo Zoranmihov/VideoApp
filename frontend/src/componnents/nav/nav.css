@@ -1,6 +1,6 @@
 nav {
     display: flex;
-    align-self: center;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
     padding: 12px 0;
@@ -58,4 +58,19 @@ nav input:focus {
     background-color: rgba(0, 0, 0, 0.2);
     z-index: 2;
     top: 0;
+}
+
+@media (max-width: 700px) {
+    nav { 
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+    }
+
+}
+
+@media (max-width: 480px) {
+    nav input {
+        min-width: 180px;
+    }
 }

@@ -26,7 +26,7 @@ export default function nav() {
     <>
       <nav>
         <div id='menuIcon' className='imgAlign'>
-          <a href="/" className='nav-links' id='logo'>VideoApp</a>
+          <a href="/" className='nav-links titlesFont' id='logo'>VideoApp</a>
         </div>
         <div className='paddingAlign imgAlign'>
           <input placeholder='Search' type="text" name="videoTitle" id="" />

@@ -34,14 +34,14 @@ export default function register({ formToggle, setFormToggle }) {
 
   return (
     <form id='registerForm' onReset={() => resetForm()} onSubmit={registerUser}>
-      <h1 id='title'>Register</h1>
+      <h1 id='title titlesFont' className='titlesFont'>Register</h1>
       <p id='error'>Test</p>
-      <label className='registerLabel' htmlFor="username">Username:</label>
+      <label className='registerLabel'>Username:</label>
       <input onChange={(e) => checkUsername(e.target)} placeholder='Username' className='registerInput' type="text"  name='username'/>
-      <label  className='registerLabel' htmlFor="password">Password:</label>
+      <label  className='registerLabel'>Password:</label>
       <input onChange={(e) => checkPassword(e.target)} placeholder='Enter your password' className='registerInput' type="password" name='password'/>
-      <label  className='registerLabel' htmlFor="password">Confirm password:</label>
-      <input placeholder='Confirm your password' className='registerInput' type="password" name='password'/>
+      <label  className='registerLabel'>Confirm password:</label>
+      <input placeholder='Confirm your password' className='registerInput' type="password" name='Cpassword'/>
       <div>
       <button className='registerBtn' id='registerBtn' type='submit'>Register</button>
       <button className='registerBtn' type='reset'>Clear</button>

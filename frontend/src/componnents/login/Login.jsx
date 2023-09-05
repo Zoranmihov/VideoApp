@@ -31,11 +31,11 @@ export default function Login({ formToggle, setFormToggle }) {
   }
   return (
     <form id='loginForm' onSubmit={loginUser}>
-      <h1 id='title'>Login</h1>
+      <h1 id='title' className='titlesFont'>Login</h1>
       <p id='error'>Test</p>
-      <label className='loginLabel' htmlFor="username">Username:</label>
+      <label className='loginLabel'>Username:</label>
       <input placeholder='Username' className='loginInput' type="text" name='username' />
-      <label className='loginLabel' htmlFor="password">Password:</label>
+      <label className='loginLabel'>Password:</label>
       <input placeholder='Enter your password' className='loginInput' type="password" name='password' />
       <div>
         <button className='loginBtn' type='submit'>Login</button>

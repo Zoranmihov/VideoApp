@@ -2,11 +2,13 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* Default to 4 columns for larger viewports */
     grid-gap: 10px;
+    padding: 0 6px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     #index {
         grid-template-columns: repeat(3, 1fr); /* 3 columns for medium viewports */
+        grid-gap: 4px;
     }
 }
 
@@ -19,5 +21,14 @@
 @media (max-width: 600px) {
     #index {
         grid-template-columns: 1fr; /* 1 column for very small viewports */
+    }
+}
+
+@media (max-width: 480px) {
+    #index {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 }
