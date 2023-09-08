@@ -1,34 +1,27 @@
 import React from 'react'
 import "./login.css"
 
+import axios from 'axios';
+
+
 export default function Login({ formToggle, setFormToggle }) {
 
   let loginUser = async (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
 
+    
+
     const username = event.target.username.value;
     const password = event.target.password.value;
 
-    try {
-      const response = await fetch('https://localhost:8443/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      console.log(data);
-
-    } catch (error) {
-      console.error('There was a problem with the fetch operation:', error.message);
-    }
+    axios.post('https://localhost:8443/auth/login', {username, password}, { withCredentials: true }).then(res => {
+      console.log("Worked")
+    }).catch(err => {
+      console.log(err)
+    })
   }
+
   return (
     <form id='loginForm' onSubmit={loginUser}>
       <h1 id='title' className='titlesFont'>Login</h1>

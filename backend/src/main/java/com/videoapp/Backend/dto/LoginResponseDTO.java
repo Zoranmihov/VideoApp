@@ -3,24 +3,24 @@ package com.videoapp.Backend.dto;
 import com.videoapp.Backend.models.ApplicationUser;
 
 public class LoginResponseDTO {
-    private ApplicationUser user;
+    private String username;
     private String jwt;
 
     public LoginResponseDTO(){
         super();
     }
 
-    public LoginResponseDTO(ApplicationUser user, String jwt){
-        this.user = user;
+    public LoginResponseDTO(String username, String jwt){
+        this.username = username;
         this.jwt = jwt;
     }
 
-    public ApplicationUser getUser() {
-        return this.user;
+    public String getUsername() {
+        return this.username;
     }
 
-    public void setUser(ApplicationUser user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getJwt() {

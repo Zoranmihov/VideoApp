@@ -3,16 +3,17 @@ import "./nav.css";
 
 import Login from '../login/Login';
 import Register from '../register/Register';
+import axios from 'axios';
 
 export default function nav() {
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [formToggle, setFormToggle] = useState(false);
-  const [modalKey, setModalKey] = useState(0); // State for modal key
+  const [modalKey, setModalKey] = useState(0);
 
   const openModal = () => {
     document.querySelector("#formModal").style.display = "flex";
-    setModalKey(prevKey => prevKey + 1); // Increment the key to force remount
+    setModalKey(prevKey => prevKey + 1);
   }
 
   const closeModal = (e) => {
@@ -20,6 +21,10 @@ export default function nav() {
       document.querySelector("#formModal").style.display = "none";
       setFormToggle(false);
     }
+  }
+
+  const test = () => {
+    axios.get("https://localhost:8443/user", {withCredentials: true}).then(res => console.log("Worked")).catch(err => console.log(err))
   }
 
   return (
@@ -30,7 +35,7 @@ export default function nav() {
         </div>
         <div className='paddingAlign imgAlign'>
           <input placeholder='Search' type="text" name="videoTitle" id="" />
-          <button id='searchBtn'>&#128269;</button>
+          <button onClick={test} id='searchBtn'>&#128269;</button>
         </div>
         {loggedIn ? (
           <div className='paddingAlign' id='userInfo'>

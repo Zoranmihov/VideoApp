@@ -65,9 +65,9 @@ public class AuthenticationService {
         try {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             String token = tokenService.generateJwt(auth);
-            return new LoginResponseDTO(userRepository.findByUsername(username).get(), token);
+            return new LoginResponseDTO(userRepository.findByUsername(username).get().getUsername(), token);
         } catch (AuthenticationException ex) {
-            return new LoginResponseDTO(null, "failed");
+            return new LoginResponseDTO(null, "Failed");
         }
     }
 
