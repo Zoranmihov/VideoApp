@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import "./nav.css";
-
-import Login from '../login/Login';
-import Register from '../register/Register';
 import axios from 'axios';
 
-export default function nav() {
+// Components
+import Login from '../login/Login';
+import Register from '../register/Register';
+import UserMenu from '../UserMenu/UserMenu';
 
-  const [loggedIn, setLoggedIn] = useState(false);
+export default function Nav({user, setUser}) {
+
   const [formToggle, setFormToggle] = useState(false);
   const [modalKey, setModalKey] = useState(0);
 
@@ -23,8 +24,15 @@ export default function nav() {
     }
   }
 
-  const test = () => {
-    axios.get("https://localhost:8443/user", {withCredentials: true}).then(res => console.log("Worked")).catch(err => console.log(err))
+  const toggleUserMenu = () => {
+    if(document.querySelector("#userMenu").style.display === "flex") {
+
+      document.querySelector("#userMenu").style.display = "none";  
+
+    } else {
+      document.querySelector("#userMenu").style.display = "flex";  
+
+    }
   }
 
   return (
@@ -35,11 +43,12 @@ export default function nav() {
         </div>
         <div className='paddingAlign imgAlign'>
           <input placeholder='Search' type="text" name="videoTitle" id="" />
-          <button onClick={test} id='searchBtn'>&#128269;</button>
+          <button id='searchBtn'>&#128269;</button>
         </div>
-        {loggedIn ? (
+        {user.username ? (
           <div className='paddingAlign' id='userInfo'>
-            <img id='avatar' src="./avatar.jpg" alt="Profile Avatar" />
+            <UserMenu username={user.username} />
+            <img id='avatar' src="./avatar.jpg" alt="Profile Avatar"  onClick={toggleUserMenu}/>
           </div>
         ) : (
           <div className='paddingAlign' id='userInfo'>
@@ -52,7 +61,7 @@ export default function nav() {
         <div id='formContainer' onClick={closeModal}>
           {formToggle ? 
             <Register key={modalKey} formToggle={formToggle} setFormToggle={setFormToggle} /> : 
-            <Login key={modalKey} formToggle={formToggle} setFormToggle={setFormToggle} />}
+            <Login setUser={setUser} key={modalKey} formToggle={formToggle} setFormToggle={setFormToggle} />}
         </div>
       </div>
     </>

@@ -4,28 +4,38 @@ import "./login.css"
 import axios from 'axios';
 
 
-export default function Login({ formToggle, setFormToggle }) {
+export default function Login({ formToggle, setFormToggle, setUser }) {
 
   let loginUser = async (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
+    event.preventDefault();
+    document.querySelector("#title").style.color = 'black';
+    document.querySelector("#loginError").style.display = 'none';
 
-    
 
     const username = event.target.username.value;
     const password = event.target.password.value;
 
 
-    axios.post('https://localhost:8443/auth/login', {username, password}, { withCredentials: true }).then(res => {
-      console.log("Worked")
+    axios.post('https://localhost:8443/auth/login', { username, password }, { withCredentials: true }).then(res => {
+      document.querySelector("#title").innerHTML = "Welcome";
+      setUser(res.data)
+      setTimeout(() => {
+        document.querySelector("#formModal").style.display = "none";
+        document.querySelector("#loginForm").reset();
+      }, 1800)
     }).catch(err => {
-      console.log(err)
+      document.querySelector("#title").style.color = 'red';
+      let loginError = document.querySelector("#loginError")
+      loginError.innerHTML = "Invalid credentials";
+      loginError.style.display = "inline"
+      document.querySelector("#loginForm").reset();
     })
   }
 
   return (
     <form id='loginForm' onSubmit={loginUser}>
       <h1 id='title' className='titlesFont'>Login</h1>
-      <p id='error'>Test</p>
+      <p className='error' id='loginError'>Test</p>
       <label className='loginLabel'>Username:</label>
       <input placeholder='Username' className='loginInput' type="text" name='username' />
       <label className='loginLabel'>Password:</label>

@@ -21,3 +21,10 @@ font-family: 'Roboto', sans-serif;;
 .titlesFont {
   font-family: 'Press Start 2P', cursive, sans-serif;
 }
+
+.error {
+  font-size: 16px;
+  color: rgb(210, 0, 0);
+  align-self: flex-start;
+  display: none;
+}

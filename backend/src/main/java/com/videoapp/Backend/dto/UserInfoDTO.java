@@ -1,25 +1,21 @@
 package com.videoapp.Backend.dto;
 
-import com.videoapp.Backend.models.ApplicationUser;
+public class UserInfoDTO {
 
-public class LoginResponseDTO {
     private String username;
-
     private String role;
-    private String jwt;
 
-    public LoginResponseDTO(){
+    public UserInfoDTO(){
         super();
     }
 
-    public LoginResponseDTO(String username, String role, String jwt){
+    public UserInfoDTO(String username, String role){
         this.username = username;
         this.role = role;
-        this.jwt = jwt;
     }
 
     public String getUsername() {
-        return this.username;
+        return username;
     }
 
     public void setUsername(String username) {
@@ -33,13 +29,4 @@ public class LoginResponseDTO {
     public void setRole(String role) {
         this.role = role;
     }
-
-    public String getJwt() {
-        return this.jwt;
-    }
-
-    public void setJwt(String jwt) {
-        this.jwt = jwt;
-    }
-
 }

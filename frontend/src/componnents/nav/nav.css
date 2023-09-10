@@ -35,6 +35,15 @@ nav input:focus {
     cursor: pointer;
 }
 
+#avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 10px;
+    cursor: pointer;
+    position: relative;
+}
+
 .nav-links {
     font-size: 24px;
     text-decoration: none;

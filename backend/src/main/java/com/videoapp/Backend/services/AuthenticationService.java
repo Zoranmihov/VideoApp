@@ -1,6 +1,7 @@
 package com.videoapp.Backend.services;
 
 import com.videoapp.Backend.dto.LoginResponseDTO;
+import com.videoapp.Backend.dto.UserInfoDTO;
 import com.videoapp.Backend.models.ApplicationUser;
 import com.videoapp.Backend.models.Role;
 import com.videoapp.Backend.repositories.RoleRepository;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,26 +40,26 @@ public class AuthenticationService {
     @Autowired
     private TokenService tokenService;
 
-    public boolean registerUser(String username, String password){
+    public String registerUser(String username, String password) {
         try {
-            Optional<Role> optionalRole = roleRepository.findByAuthority("USER");
-            if (!optionalRole.isPresent()) {
-                // Log the error or handle the case where the role is not found
-                return false;
+            Optional<ApplicationUser> existingUser = userRepository.findByUsername(username);
+            if (existingUser.isPresent()) {
+                return "Username taken";
             }
+
+            Optional<Role> optionalRole = roleRepository.findByAuthority("USER");
             Role userRole = optionalRole.get();
             Set<Role> authorities = new HashSet<>();
             authorities.add(userRole);
             userRepository.save(new ApplicationUser(0, username, passwordEncoder.encode(password), authorities));
-            return true;
+            return "Success";
+
         } catch (DataAccessException dae) {
-            // Log database-related exceptions
-            // log.error("Database error occurred", dae);
-            return false;
+
+            return "Database error";
         } catch (Exception exception) {
-            // Log other exceptions
-            // log.error("An error occurred", exception);
-            return false;
+
+            return "Error occurred";
         }
     }
 
@@ -65,10 +67,24 @@ public class AuthenticationService {
         try {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             String token = tokenService.generateJwt(auth);
-            return new LoginResponseDTO(userRepository.findByUsername(username).get().getUsername(), token);
+            ApplicationUser user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            Set<Role> roles = (Set<Role>) user.getAuthorities();
+            Optional<Role> roleOptional = roles.stream().findFirst();
+            String role = roleOptional.isPresent() ? roleOptional.get().getAuthority() : "UNKNOWN_ROLE";
+            return new LoginResponseDTO(user.getUsername(),role, token);
         } catch (AuthenticationException ex) {
-            return new LoginResponseDTO(null, "Failed");
+            return new LoginResponseDTO(null,null,"Failed");
         }
+    }
+
+    public UserInfoDTO userInfo(String username){
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Set<Role> roles = (Set<Role>) user.getAuthorities();
+        Optional<Role> roleOptional = roles.stream().findFirst();
+        String role = roleOptional.isPresent() ? roleOptional.get().getAuthority() : "UNKNOWN_ROLE";
+        return new UserInfoDTO(user.getUsername(), role.toLowerCase());
+
     }
 
 }

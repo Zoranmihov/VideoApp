@@ -38,7 +38,6 @@ public class BearerFilter implements Filter {
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                System.out.println(cookie.getName());
                 if ("JWT".equals(cookie.getName())) {
                     jwtTokenHolder[0] = cookie.getValue();
                     break;
@@ -51,7 +50,6 @@ public class BearerFilter implements Filter {
                 @Override
                 public Enumeration<String> getHeaders(String name) {
                     if ("Authorization".equalsIgnoreCase(name)) {
-                        System.out.println("Bearer " + jwtTokenHolder[0]);
                         return Collections.enumeration(Collections.singletonList("Bearer " + jwtTokenHolder[0]));
                     }
                     return super.getHeaders(name);

@@ -1,0 +1,88 @@
+#uploadVideo {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.1);
+    min-height: calc(100vh - 60px);
+    height: 100%;
+    padding-bottom: 6px;
+    overflow: auto;
+}
+
+#uploadVideo form {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(255, 255, 255);
+    padding: 12px 14px;
+}
+
+#title {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+
+
+#uploadVideo label {
+    align-self: flex-start;
+    font-size: 22px;
+    margin: 6px 0;
+}
+
+#uploadVideo input {
+    width: 100%;
+    font-size: 24px;
+}
+
+#fileInput,
+#thumbnailInput {
+    display: none;
+}
+
+#uploadVideo button {
+    font-size: 20px;
+    margin: 12px 16px 8px 0;
+    padding: 2px 4px;
+    cursor: pointer;
+    width: 45%;
+}
+
+#filePick,
+#thumbnailPick {
+    width: 100% !important;
+}
+
+#buttonDiv {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#thumbnailContainer,
+#thumbnailPreview {
+    height: 533px;
+    width: 616px;
+}
+
+#thumbnailContainer {
+    display: none;
+}
+
+textarea{
+    height: 150px;
+    resize: none;
+}
+
+@media (max-width: 1240px) {
+    #uploadVideo {
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 16px;
+    }
+
+    #thumbnailPreview {
+        margin-top: 16px;
+    }
+
+}

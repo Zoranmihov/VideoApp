@@ -1,13 +1,38 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VideoApp</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoApp</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+  <script>
+    function closeMenu(e) {
+      let targetElement = e.target;
+
+      do {
+        if (targetElement.id === "userMenu" || targetElement.id === "avatar") {
+          return;
+        }
+        targetElement = targetElement.parentNode;
+      } while (targetElement);
+
+      const userMenu = document.querySelector("#userMenu");
+      if (userMenu) {
+        userMenu.style.display = "none";
+      }
+    }
+
+    // Ensure the DOM is fully loaded before attaching the event listener
+    document.addEventListener('DOMContentLoaded', (event) => {
+      document.addEventListener('click', closeMenu);
+    });
+  </script>
+</body>
+
 </html>
