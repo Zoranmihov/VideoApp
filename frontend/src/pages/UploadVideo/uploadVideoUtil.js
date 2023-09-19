@@ -3,9 +3,11 @@ import axios from "axios";
 
 export const updateFileName = (e) => {
     if (e.target.files[0]) {
-        if (e.target.files[0].type != 'video/mp4') {
+
+
+        if (e.target.files[0].type != 'video/mp4' && e.target.files[0].type !== 'video/quicktime') {
             const error = document.querySelector("#uploadError");
-            error.innerHTML = "Only videos of type mp4 are allowed";
+            error.innerHTML = "Only videos of type mp4 or mov are allowed";
             error.style.display = 'block';
 
         } else {
@@ -67,6 +69,31 @@ export const videoUpload = (event) => {
         },
         withCredentials: true,
     })
-        .then(res => console.log("Worked"))
-        .catch(err => console.log(err));
+        .then(res => {
+            const status = document.querySelector("#uploadError")
+            document.querySelector("#uploadTitle").style.color = "rgb(128, 201, 18)"
+            status.innerHTML = 'Video was uploaded and is being processed.'
+            status.style.color = "rgb(128, 201, 18)"
+            status.style.display = "block";
+            
+            setTimeout(() => {
+                document.querySelector("#uploadTitle").style.color = "black"
+                const status = document.querySelector("#uploadError")
+                status.style.display = 'none'
+                status.style.color = "red"
+            }, 1300)
+        })
+        .catch(err => {
+            const status = document.querySelector("#uploadError")
+            document.querySelector("#uploadTitle").style.color = "red"
+            status.innerHTML = 'Upload failed please contact support.'
+            status.style.color = "red"
+            status.style.display = "block";
+            
+            setTimeout(() => {
+                document.querySelector("#uploadTitle").style.color = "black"
+                const status = document.querySelector("#uploadError")
+                status.style.display = 'none'
+            }, 1300)
+        });
 }

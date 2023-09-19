@@ -8,13 +8,13 @@ export default function UploadVideo() {
     return (
         <div id="uploadVideo">
             <form onSubmit={(e) => videoUpload(e)} onReset={(e) => clearForm(e.target)}>
-                <h1 id="title" className="titlesFont">Upload a video</h1>
+                <h1 id="uploadTitle" className="titlesFont">Upload a video</h1>
                 <p className="error" id="uploadError">Hello</p>
                 <label>Video Title</label>
                 <input required name="title" type="text" placeholder="Enter title" />
                 <label>Description</label>
                 <textarea required name="description"></textarea>
-                <input onChange={(e) => updateFileName(e)} id="fileInput" type="file" name="video" required accept=".mp4" />
+                <input onChange={(e) => updateFileName(e)} id="fileInput" type="file" name="video" required accept=".mp4 .mov" />
                 <label id="fileName"></label>
                 <label id="thumbnailName"></label>
                 <button id="filePick" type="button" onClick={filePick}>Chose a video</button>

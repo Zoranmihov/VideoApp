@@ -16,7 +16,7 @@ import ProtectedRoutes from './componnents/protectedRoutes/ProtectedRoutes';
 function App() {
   let [loggedIn, setLoggedIn] = useState(false);
   let [user, setUser] = useState({});
-  let [loading, setLoading] = useState(false);
+  let [loading, setLoading] = useState(true);
 
 
 
