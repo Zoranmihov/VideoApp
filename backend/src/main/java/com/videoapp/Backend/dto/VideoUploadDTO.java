@@ -1,11 +1,10 @@
 package com.videoapp.Backend.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
 
 public class VideoUploadDTO {
 
@@ -20,18 +19,26 @@ public class VideoUploadDTO {
     @NotNull(message = "Video file cannot be null")
     private MultipartFile video;
 
-    @NotNull(message = "Thumbnail file cannot be null")
-    private MultipartFile thumbnail;
+    @Nullable
+    private byte[] thumbnail;
+
+    @Nullable
+    private String videoTempPath;
+
+    @Nullable
+    private String thumbnailTempPath;
 
     public VideoUploadDTO() {
         super();
     }
 
-    public VideoUploadDTO(String title, String description, MultipartFile video, MultipartFile thumbnail) {
+    public VideoUploadDTO(String title, String description, MultipartFile video, byte[] thumbnail, String videoTempPath, String thumbnailTempPath) {
         this.title = title;
         this.description = description;
         this.video = video;
         this.thumbnail = thumbnail;
+        this.videoTempPath = videoTempPath;
+        this.thumbnailTempPath = thumbnailTempPath;
     }
 
     public String getTitle() {
@@ -58,12 +65,30 @@ public class VideoUploadDTO {
         this.video = video;
     }
 
-    public MultipartFile getThumbnail() {
+    @Nullable
+    public byte[] getThumbnail() {
         return thumbnail;
     }
 
-    public void setThumbnail(MultipartFile thumbnail) {
+    public void setThumbnail(@Nullable byte[] thumbnail) {
         this.thumbnail = thumbnail;
     }
 
+    @Nullable
+    public String getVideoTempPath() {
+        return videoTempPath;
+    }
+
+    public void setVideoTempPath(@Nullable String videoTempPath) {
+        this.videoTempPath = videoTempPath;
+    }
+
+    @Nullable
+    public String getThumbnailTempPath() {
+        return thumbnailTempPath;
+    }
+
+    public void setThumbnailTempPath(@Nullable String thumbnailTempPath) {
+        this.thumbnailTempPath = thumbnailTempPath;
+    }
 }

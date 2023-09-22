@@ -3,7 +3,6 @@ package com.videoapp.Backend.controllers;
 import com.videoapp.Backend.dto.LoginResponseDTO;
 import com.videoapp.Backend.dto.RegistrationDTO;
 import com.videoapp.Backend.dto.UserInfoDTO;
-import com.videoapp.Backend.models.ApplicationUser;
 import com.videoapp.Backend.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -19,8 +19,8 @@ public class Video {
 
     @Column(name = "video_path")
     private String videoPath;
-    @Column(name = "thumbnail_path")
-    private String thumbnailPath;
+    @Column(name = "thumbnail", columnDefinition = "longblob")
+    private byte[] thumbnail;
     @Column(name = "uploaded_by")
     private String uploadedBy;
 
@@ -30,11 +30,11 @@ public class Video {
         super();
     }
 
-    public Video(String title, String description, String videoPath, String thumbnailPath, String uploadedBy, LocalDateTime timestamp){
+    public Video(String title, String description, String videoPath, byte[] thumbnail, String uploadedBy, LocalDateTime timestamp){
         this.title = title;
         this.description = description;
         this.videoPath = videoPath;
-        this.thumbnailPath = thumbnailPath;
+        this.thumbnail = thumbnail;
         this.uploadedBy = uploadedBy;
         this.timestamp = timestamp;
     }
@@ -67,12 +67,12 @@ public class Video {
         this.videoPath = videoPath;
     }
 
-    public String getThumbnailPath() {
-        return thumbnailPath;
+    public byte[] getThumbnail() {
+        return thumbnail;
     }
 
-    public void setThumbnailPath(String thumbnailPath) {
-        this.thumbnailPath = thumbnailPath;
+    public void setThumbnail(byte[] thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public String getUploadedBy() {

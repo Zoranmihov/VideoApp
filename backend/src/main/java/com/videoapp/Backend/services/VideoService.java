@@ -1,5 +1,6 @@
 package com.videoapp.Backend.services;
 
+import com.videoapp.Backend.dto.GetHomeVideosDTO;
 import com.videoapp.Backend.dto.VideoUploadDTO;
 import com.videoapp.Backend.models.Video;
 import com.videoapp.Backend.repositories.VideoRepository;
@@ -7,6 +8,7 @@ import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -14,14 +16,24 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
+
 
 @Service
 @Transactional
 public class VideoService {
+
+ private static final Logger logger = Logger.getLogger(VideoService.class.getName());
+
 
  @Autowired
  private VideoRepository videoRepository;
@@ -32,52 +44,74 @@ public class VideoService {
  @Value("${spring.servlet.multipart.location}")
  private String tempUploadPath;
 
+ public List<GetHomeVideosDTO> getRecentVideos() {
+  List<Video> videos = videoRepository.findTop20ByOrderByTimestampDesc();
+
+  // Create a list of GetHomeVideosDTO objects from the list of Video objects.
+  List<GetHomeVideosDTO> getHomeVideosDTOs = new ArrayList<>();
+  for (Video video : videos) {
+   // Create a new GetHomeVideosDTO object.
+   GetHomeVideosDTO getHomeVideosDTO = new GetHomeVideosDTO(video.getVideoId(), video.getTitle(), video.getUploadedBy(), video.getTimestamp(), video.getThumbnail());
+
+   // Add the GetHomeVideosDTO object to the list.
+   getHomeVideosDTOs.add(getHomeVideosDTO);
+  }
+
+  // Return the list of GetHomeVideosDTO objects.
+  return getHomeVideosDTOs;
+ }
+
  @Async
- public Future<String> videoUpload(VideoUploadDTO videoUploadDTO, String username) throws IOException {
-  // Replace whitespaces in the username
-  username = username.replaceAll("\\s+", "_");
+ public Future<String> videoUpload(VideoUploadDTO videoUploadDTO, String username) {
+  try {
+   // Replace whitespaces in the username
+   username = username.replaceAll("\\s+", "_");
 
-  Path userDirectory = Paths.get(baseUploadPath, username);
+   // Create a directory for the user in the base upload path
+   Path userDirectory = Paths.get(baseUploadPath, username);
 
-  // Replace whitespaces in the video title
-  String videoDirectoryName = videoUploadDTO.getTitle().replaceAll("\\s+", "_");
-  String originalDirectoryName = videoDirectoryName;
-  int count = 1;
-  while (Files.exists(userDirectory.resolve(videoDirectoryName))) {
-   videoDirectoryName = originalDirectoryName + " (" + count + ")";
-   count++;
+   // Replace whitespaces in the video title
+   String videoDirectoryName = videoUploadDTO.getTitle().replaceAll("\\s+", "_");
+   String originalDirectoryName = videoDirectoryName;
+   int count = 1;
+   while (Files.exists(userDirectory.resolve(videoDirectoryName))) {
+    videoDirectoryName = originalDirectoryName + "_(" + count + ")";
+    count++;
+   }
+
+   Path videoDirectory = userDirectory.resolve(videoDirectoryName);
+   Files.createDirectories(videoDirectory);
+
+   // Get the video and thumbnail paths from the DTO
+   String videoPath = videoUploadDTO.getVideoTempPath();
+
+   // Check if the video file exists
+   if (!Files.exists(Paths.get(videoPath))) {
+    throw new IOException("Video file not found: " + videoPath);
+   }
+
+   // Move the video file to the video directory
+   Files.move(Paths.get(videoPath), videoDirectory.resolve(Paths.get(videoPath).getFileName()));
+
+   // Convert the video to mp4 format
+   Path convertedVideoPath = convertAndResizeVideo(videoDirectory.resolve(Paths.get(videoPath).getFileName()));
+
+   if (videoUploadDTO.getThumbnail() == null) {
+    videoUploadDTO.setThumbnail(extractThumbnailBytes(convertedVideoPath));
+   }
+
+   // Create a new Video object and save it to the database
+   Video video = new Video(videoUploadDTO.getTitle(), videoUploadDTO.getDescription(), convertedVideoPath.toString(), videoUploadDTO.getThumbnail(), username, LocalDateTime.now());
+   videoRepository.save(video);
+
+   // Clear temp directory
+   clearTempDirectory(username);
+
+   return new AsyncResult<>("Video uploaded successfully");
+  } catch (Exception e) {
+   logger.severe("Error during video upload for user: " + username + ". Error: \n" + e);
+   throw new RuntimeException("Video upload failed. Please check logs for more details.", e);
   }
-
-  Path videoDirectory = userDirectory.resolve(videoDirectoryName);
-  Files.createDirectories(videoDirectory);
-
-  String originalVideoName = videoUploadDTO.getVideo().getOriginalFilename();
-  String originalThumbnailName = videoUploadDTO.getThumbnail().getOriginalFilename();
-
-  System.out.println("Attempting to move video to: " + videoDirectory.resolve(originalVideoName).toString());
-
-  Path tempVideoPath = Paths.get(tempUploadPath, originalVideoName);
-  if (!Files.exists(tempVideoPath)) {
-   throw new IOException("Temporary video file not found: " + tempVideoPath.toString());
-  }
-  Files.move(tempVideoPath, videoDirectory.resolve(originalVideoName));
-
-  Path tempThumbnailPath = Paths.get(tempUploadPath, originalThumbnailName);
-  if (!Files.exists(tempThumbnailPath)) {
-   throw new IOException("Temporary thumbnail file not found: " + tempThumbnailPath.toString());
-  }
-  Files.move(tempThumbnailPath, videoDirectory.resolve(originalThumbnailName));
-
-  // Convert the video to mp4 format
-  Path convertedVideoPath = convertAndResizeVideo(videoDirectory.resolve(originalVideoName));
-
-  // Create a new Video object and save it to the database
-  Video video = new Video(videoUploadDTO.getTitle(), videoUploadDTO.getDescription(), convertedVideoPath.toString(), videoDirectory.resolve(originalThumbnailName).toString(), username, LocalDateTime.now());
-  videoRepository.save(video);
-
-  clearTempDirectory();
-
-  return new AsyncResult<>("Video uploaded successfully");
  }
 
  private Path convertAndResizeVideo(Path videoPath) throws IOException {
@@ -130,14 +164,44 @@ public class VideoService {
   return Paths.get(outputVideoPath);
  }
 
- private void clearTempDirectory() {
+ public byte[] extractThumbnailBytes(Path convertedVideoPath) throws IOException {
+  FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(convertedVideoPath.toString());
+  grabber.start();
+
+  // Grab the first frame
+  Frame frame = grabber.grabImage();
+
+  // Use JavaCV's FrameToImage to convert the Frame to a BufferedImage
+  Java2DFrameConverter converter = new Java2DFrameConverter();
+  BufferedImage thumbnailImage = converter.convert(frame);
+
+  // Use Java's ImageIO to write the BufferedImage to a ByteArrayOutputStream
+  ByteArrayOutputStream baos = new ByteArrayOutputStream();
+  ImageIO.write(thumbnailImage, "jpg", baos);
+  byte[] thumbnailBytes = baos.toByteArray();
+
+  grabber.stop();
+
+  return thumbnailBytes;
+ }
+
+
+ private void clearTempDirectory(String username) {
   Path absoluteTempDirectory = Paths.get(tempUploadPath).toAbsolutePath();
-  try (DirectoryStream<Path> stream = Files.newDirectoryStream(absoluteTempDirectory)) {
+  Path userTempDirectory = absoluteTempDirectory.resolve(username);
+
+  try (DirectoryStream<Path> stream = Files.newDirectoryStream(userTempDirectory)) {
    for (Path path : stream) {
     Files.deleteIfExists(path);
    }
   } catch (IOException e) {
    System.err.println("Failed to clear temp directory: " + e.getMessage());
+  }
+
+  try {
+   Files.deleteIfExists(userTempDirectory);
+  } catch (IOException e) {
+   System.err.println("Failed to delete user temp directory: " + e.getMessage());
   }
  }
 }

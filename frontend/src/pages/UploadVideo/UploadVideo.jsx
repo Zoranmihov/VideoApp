@@ -18,10 +18,10 @@ export default function UploadVideo() {
                 <label id="fileName"></label>
                 <label id="thumbnailName"></label>
                 <button id="filePick" type="button" onClick={filePick}>Chose a video</button>
-                <input onChange={(e) => updateThumbnail(e)} id="thumbnailInput" type="file" name="thumbnail" required accept=".jpg, .jpeg, .png" />
+                <input onChange={(e) => updateThumbnail(e)} id="thumbnailInput" type="file" name="thumbnail" accept=".jpg, .jpeg, .png" />
                 <button id="thumbnailPick" type="button" onClick={thumbnailPick}>Chose a thumbnail</button>
                 <div id="buttonDiv">
-                    <button type="submit">Upload</button>
+                    <button id="uploadSub" type="submit">Upload</button>
                     <button type="reset">Cancel</button>
                 </div>
             </form>

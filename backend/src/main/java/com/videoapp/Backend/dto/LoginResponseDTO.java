@@ -1,7 +1,5 @@
 package com.videoapp.Backend.dto;
 
-import com.videoapp.Backend.models.ApplicationUser;
-
 public class LoginResponseDTO {
     private String username;
 

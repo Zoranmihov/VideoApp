@@ -56,12 +56,27 @@ export const clearForm = (form) => {
 
 export const videoUpload = (event) => {
     event.preventDefault();
-
+    document.querySelector("#uploadSub").disabled = true;
     const formData = new FormData();
     formData.append('title', event.target.title.value);
     formData.append('description', event.target.description.value);
     formData.append('video', event.target.video.files[0]);
-    formData.append('thumbnail', event.target.thumbnail.files[0]);
+    if (event.target.thumbnail.files[0]) {
+        // Get the thumbnail file.
+        const thumbnailFile = event.target.thumbnail.files[0];
+
+        // Create a new FileReader object.
+        const reader = new FileReader();
+
+        // Set the onload event handler for the FileReader object.
+        reader.onload = function () {
+            // Get the bytes of the thumbnail file.
+            const thumbnailBytes = reader.result;
+
+            // Append the thumbnail bytes to the FormData object.
+            formData.append('thumbnail', thumbnailBytes);
+        }
+    }
 
     axios.post('https://localhost:8443/user/uploadvideo', formData, {
         headers: {
@@ -75,25 +90,28 @@ export const videoUpload = (event) => {
             status.innerHTML = 'Video was uploaded and is being processed.'
             status.style.color = "rgb(128, 201, 18)"
             status.style.display = "block";
-            
+
             setTimeout(() => {
                 document.querySelector("#uploadTitle").style.color = "black"
                 const status = document.querySelector("#uploadError")
                 status.style.display = 'none'
                 status.style.color = "red"
+                document.querySelector("#uploadSub").disabled = false;
             }, 1300)
         })
         .catch(err => {
+            console.log(err.response.data)
             const status = document.querySelector("#uploadError")
             document.querySelector("#uploadTitle").style.color = "red"
             status.innerHTML = 'Upload failed please contact support.'
             status.style.color = "red"
             status.style.display = "block";
-            
+
             setTimeout(() => {
                 document.querySelector("#uploadTitle").style.color = "black"
                 const status = document.querySelector("#uploadError")
                 status.style.display = 'none'
+                document.querySelector("#uploadSub").disabled = false;
             }, 1300)
         });
 }
