@@ -9,9 +9,11 @@ import Nav from './componnents/nav/Nav.jsx';
 import Index from './pages/index/Index.jsx';
 import Loading from './pages/Loading/Loading';
 import UploadVideo from './pages/UploadVideo/UploadVideo';
+import VideoPlayer from './componnents/videoPlayer/VideoPlayer';
 
 // Guards
 import ProtectedRoutes from './componnents/protectedRoutes/ProtectedRoutes';
+
 
 function App() {
   let [loggedIn, setLoggedIn] = useState(false);
@@ -52,6 +54,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route index element={<Index />} />
+              <Route path='/videoplayer' element={<VideoPlayer />} />
               {/* Protected routes   */}
               <Route element={<ProtectedRoutes username={user.username} />}>
                 <Route path='/upload' element={<UploadVideo />} />

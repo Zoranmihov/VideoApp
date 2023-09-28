@@ -10,9 +10,9 @@ export const calculateDaysAgo = (uploadedAt) => {
     if (diffInDays < 1) {
       return "Today";
   } else if (diffInDays === 1) {
-      return `${diffInDays} day ago`;
+      return `${diffInDays} Day ago`;
   } else {
-      return `${diffInDays} days ago`;
+      return `${diffInDays} Days ago`;
   }
 
   }

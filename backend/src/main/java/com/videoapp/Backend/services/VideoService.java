@@ -1,16 +1,16 @@
 package com.videoapp.Backend.services;
 
 import com.videoapp.Backend.dto.GetHomeVideosDTO;
+import com.videoapp.Backend.dto.VideoStreamDTO;
 import com.videoapp.Backend.dto.VideoUploadDTO;
 import com.videoapp.Backend.models.Video;
 import com.videoapp.Backend.repositories.VideoRepository;
 import org.bytedeco.ffmpeg.global.avcodec;
-import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.FFmpegFrameRecorder;
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -114,15 +116,47 @@ public class VideoService {
   }
  }
 
- private Path convertAndResizeVideo(Path videoPath) throws IOException {
-  String inputVideoPath = videoPath.toString();
+ public VideoStreamDTO streamVideo(Integer videoId, String rangeHeader) throws IOException {
+  // Fetch video details from the database
+  Video video = videoRepository.findById(videoId)
+          .orElseThrow(() -> new IOException("Video not found"));
 
-  // Check if the input video is either .mov or .mp4
-  if (!inputVideoPath.endsWith(".mov") && !inputVideoPath.endsWith(".mp4")) {
-   throw new IllegalArgumentException("Unsupported video format. Only .mov and .mp4 are accepted.");
+  String videoPath = video.getVideoPath();
+  File videoFile = new File(videoPath);
+
+  System.out.println(videoPath);
+  if (!videoFile.exists()) {
+   throw new IOException("Video file not found");
   }
 
-  // Set the output format to .mp4
+  // Parse the Range header to determine the byte range to serve
+  long start = 0;
+  long end = videoFile.length() - 1;
+  if (rangeHeader != null) {
+   String[] ranges = rangeHeader.replace("bytes=", "").split("-");
+   start = Long.parseLong(ranges[0]);
+   if (ranges.length > 1) {
+    end = Long.parseLong(ranges[1]);
+   }
+  }
+
+  // Read the chunk from the video file
+  try (RandomAccessFile raf = new RandomAccessFile(videoFile, "r")) {
+   byte[] chunk = new byte[(int) (end - start + 1)];
+   raf.seek(start);
+   raf.readFully(chunk);
+
+   // Create a ByteArrayResource to hold the chunk of video
+   Resource resource = new ByteArrayResource(chunk);
+
+   String contentRange = "bytes " + start + "-" + end + "/" + videoFile.length();
+   return new VideoStreamDTO(206, contentRange, resource);
+  }
+ }
+
+
+ private Path convertAndResizeVideo(Path videoPath) throws IOException {
+  String inputVideoPath = videoPath.toString();
   String outputVideoPath = inputVideoPath.substring(0, inputVideoPath.lastIndexOf('.')) + ".mp4";
 
   try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputVideoPath)) {
@@ -130,33 +164,55 @@ public class VideoService {
 
    int width = grabber.getImageWidth();
    int height = grabber.getImageHeight();
+   double frameRate = grabber.getFrameRate();
+   int videoBitrate = grabber.getVideoBitrate();
 
-   // If height is greater than 1080p, resize while maintaining aspect ratio
-   if (height > 1080) {
+   // Check if resizing is needed
+   boolean resizeNeeded = height > 1080;
+   if (resizeNeeded) {
     width = (int) (width * (1080.0 / height));
     height = 1080;
    }
 
-   try (FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputVideoPath, width, height)) {
-    recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
-    recorder.setFormat("mp4");
-    recorder.setFrameRate(grabber.getFrameRate());
-    recorder.setVideoBitrate(grabber.getVideoBitrate());
-    recorder.setImageWidth(width);
-    recorder.setImageHeight(height);
+   int audioChannels = grabber.getAudioChannels();
+   int audioBitrate = grabber.getAudioBitrate();
+   int sampleRate = grabber.getSampleRate();
 
-    recorder.start();
+   // Check if conversion is needed
+   boolean conversionNeeded = !inputVideoPath.endsWith(".mp4") || resizeNeeded;
 
-    Frame frame;
-    while ((frame = grabber.grab()) != null) {
-     recorder.record(frame);
+   if (conversionNeeded) {
+    try (FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputVideoPath, width, height)) {
+     recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);  // Set H264 codec for both .mov and .mp4
+     recorder.setAudioCodec(avcodec.AV_CODEC_ID_AAC);  // Set AAC codec for both .mov and .mp4
+
+     recorder.setVideoOption("profile", "high");
+     recorder.setFormat("mp4");
+     recorder.setFrameRate(frameRate);
+     recorder.setVideoBitrate(videoBitrate);
+     recorder.setImageWidth(width);
+     recorder.setImageHeight(height);
+     recorder.setAudioChannels(audioChannels);
+     recorder.setAudioBitrate(audioBitrate);
+     recorder.setSampleRate(sampleRate);
+
+     recorder.start();
+
+     Frame frame;
+     while ((frame = grabber.grab()) != null) {
+      recorder.record(frame);
+     }
     }
+   } else {
+    // If no conversion or resizing is needed, just return the original path
+    return videoPath;
    }
+
   } catch (Exception e) {
-   throw new IOException("Error during video conversion", e);
+   throw new IOException("Error during video conversion: " + e.getMessage(), e);
   }
 
-  // Delete the original video if it's different from the output
+  // If the input video path and output video path are different, delete the original file
   if (!inputVideoPath.equals(outputVideoPath)) {
    Files.delete(videoPath);
   }

@@ -21,6 +21,9 @@
     margin-bottom: 12px;
 }
 
+#uploadVideo textarea {
+    padding: 2px 4px;
+}
 
 
 #uploadVideo label {
