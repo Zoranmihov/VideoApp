@@ -1,3 +1,5 @@
+
+
 export const calculateDaysAgo = (uploadedAt) => {
     const uploadDate = new Date(uploadedAt);
 

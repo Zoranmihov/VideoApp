@@ -17,6 +17,7 @@ public class Comment {
     @JoinColumn(name = "video_id", referencedColumnName = "video_id")
     private Video video;
 
+    @Column(name = "content", columnDefinition="TEXT")
     private String content;
 
     @Column(name = "commented_by")
@@ -37,6 +38,10 @@ public class Comment {
 
     public Integer getCommentId() {
         return commentId;
+    }
+
+    public void setCommentId(Integer commentId) {
+        this.commentId = commentId;
     }
 
     public Video getVideo() {

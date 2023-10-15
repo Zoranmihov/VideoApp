@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'Roboto';
-  src: url('./fonts/Roboto-Medium.ttf');
+  src: url('./assets/fonts/Roboto-Medium.ttf');
 }
 
 @font-face {
   font-family: 'Press Start 2P';
-  src: url('./fonts/PressStart2P-Regular.ttf');
+  src: url('./assets/fonts/PressStart2P-Regular.ttf');
 }
 
 * {

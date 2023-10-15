@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import axios from 'axios';
@@ -9,42 +9,43 @@ import Nav from './componnents/nav/Nav.jsx';
 import Index from './pages/index/Index.jsx';
 import Loading from './pages/Loading/Loading';
 import UploadVideo from './pages/UploadVideo/UploadVideo';
-import VideoPlayer from './componnents/videoPlayer/VideoPlayer';
+import VideoPlayer from './pages/videoPlayer/VideoPlayer';
 
 // Guards
 import ProtectedRoutes from './componnents/protectedRoutes/ProtectedRoutes';
 
+// Context
+import AppProvider from './context/AppProvider';
+import AppContext from './context/AppContext';
 
 function App() {
-  let [loggedIn, setLoggedIn] = useState(false);
-  let [user, setUser] = useState({});
+  let { user, setUser } = useContext(AppContext);
   let [loading, setLoading] = useState(true);
 
 
+   useEffect(() => {
+  /* Set automated login */
+   axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
+     setUser(res.data)
+     setLoading(false)
+   }).catch(err => {
+     console.log(err)
+     setLoading(false)
+   })
 
-  useEffect(() => {
-    /* Set automated login */
-    axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
-      setUser(res.data)
-      setLoading(false)
-    }).catch(err => {
-      console.log(err)
-      setLoading(false)
-    })
 
+  // axios.post('https://localhost:8443/auth/userinfo', {}, {
+  //   withCredentials: true,
+  // }).then(res => {
+  //   setUser(res.data)
+  //   setLoading(false)
+  // }).catch(err => {
+  //   console.log(err)
+  //   setUser({})
+  //   setLoading(false)
+  // })
 
-    // axios.post('https://localhost:8443/auth/userinfo', {}, {
-    //   withCredentials: true,
-    // }).then(res => {
-    //   setUser(res.data)
-    //   setLoading(false)
-    // }).catch(err => {
-    //   console.log(err)
-    //   setUser({})
-    //   setLoading(false)
-    // })
-
-  }, []);
+    }, []);
 
   return (
     <>
@@ -54,7 +55,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route index element={<Index />} />
-              <Route path='/videoplayer' element={<VideoPlayer />} />
+              <Route path='/videoplayer/:videoId' element={<VideoPlayer />} />
               {/* Protected routes   */}
               <Route element={<ProtectedRoutes username={user.username} />}>
                 <Route path='/upload' element={<UploadVideo />} />
@@ -68,7 +69,11 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+
   <React.StrictMode>
-    <App />
+    <AppProvider>
+      <App />
+    </AppProvider>
+
   </React.StrictMode>
 );

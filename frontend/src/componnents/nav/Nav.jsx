@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import "./nav.css";
-import axios from 'axios';
+
+import avatar from '../../assets/avatar.jpg'
 
 // Components
 import Login from '../login/Login';
 import Register from '../register/Register';
 import UserMenu from '../UserMenu/UserMenu';
+import SearchIcon from '../SearchIcon/SearchIcon';
 
 export default function Nav({user, setUser}) {
 
@@ -43,12 +45,14 @@ export default function Nav({user, setUser}) {
         </div>
         <div className='paddingAlign imgAlign'>
           <input placeholder='Search' type="text" name="videoTitle" id="" />
-          <button id='searchBtn'>&#128269;</button>
+          <button id='searchBtn'>
+            <SearchIcon />
+          </button>
         </div>
         {user.username ? (
           <div className='paddingAlign' id='userInfo'>
             <UserMenu username={user.username} />
-            <img id='avatar' src="./avatar.jpg" alt="Profile Avatar"  onClick={toggleUserMenu}/>
+            <img id='avatar' src={avatar} alt="Profile Avatar"  onClick={toggleUserMenu}/>
           </div>
         ) : (
           <div className='paddingAlign' id='userInfo'>

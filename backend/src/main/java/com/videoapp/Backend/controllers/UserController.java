@@ -1,6 +1,10 @@
 package com.videoapp.Backend.controllers;
 
+import com.videoapp.Backend.dto.DeleteCommentDTO;
+import com.videoapp.Backend.dto.EditCommentDTO;
+import com.videoapp.Backend.dto.LeaveCommentDTO;
 import com.videoapp.Backend.dto.VideoUploadDTO;
+import com.videoapp.Backend.services.CommentService;
 import com.videoapp.Backend.services.VideoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +27,11 @@ public class UserController {
     @Autowired
     private VideoService videoService;
 
+    @Autowired
+    private CommentService commentService;
+
     @Value("${spring.servlet.multipart.location}")
     private String tempUploadPath;
-
-    @GetMapping
-    public ResponseEntity<String> test() {
-        return new ResponseEntity<String>("Hello", HttpStatus.OK);
-    }
 
     @PostMapping(value = "/uploadvideo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadVideo(@Valid @ModelAttribute VideoUploadDTO videoUploadDTO, Authentication auth) {
@@ -71,5 +73,22 @@ public class UserController {
         }
     }
 
+    @PostMapping("/leavecomment")
+    public ResponseEntity<String> postComment(@Valid @RequestBody LeaveCommentDTO leaveCommentDTO) {
+        Integer videoId = leaveCommentDTO.getVideoId();
+        if(videoId == null) {
+            throw new IllegalArgumentException("videoId must not be null");
+        }
+        return commentService.leaveComment(leaveCommentDTO);
+    }
 
+    @PostMapping("/delcomment")
+    public ResponseEntity<String> deleteComment (@Valid @RequestBody DeleteCommentDTO deleteCommentDTO){
+        return commentService.deleteComment(deleteCommentDTO);
+    }
+
+    @PutMapping("/editcomment")
+    public ResponseEntity<String> editComment(@Valid @RequestBody EditCommentDTO editCommentDTO){
+        return commentService.editComment(editCommentDTO);
+    }
 }

@@ -28,6 +28,7 @@ nav input:focus {
     font-size: 16px;
     border-left: none;
     background-color: inherit;
+    padding-top: 1px;
 }
 
 #searchBtn:hover {
@@ -76,10 +77,18 @@ nav input:focus {
         align-content: center;
     }
 
+    #searchBtn {
+        padding-top: 0;
+    }
+
 }
 
 @media (max-width: 480px) {
     nav input {
         min-width: 180px;
+    }
+
+    #searchBtn {
+        padding-top: 0;
     }
 }

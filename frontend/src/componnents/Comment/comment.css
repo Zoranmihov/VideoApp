@@ -1,0 +1,109 @@
+#comments {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+#comments form {
+    display: flex;
+    flex-direction: column;
+}
+
+#comments input {
+    margin-top: 12px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    padding: 0 4px;
+    border-bottom: 1px solid black;
+}
+
+#charCount,
+#editCharCount {
+    align-self: flex-end;
+    margin-top: 8px;
+}
+
+#commentsButtonsContainer {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.commentBtn {
+    width: 130px;
+    align-self: center;
+    margin: 12px 0 12px 16px;
+    font-size: 20px;
+}
+
+.commentBox {
+    display: flex;
+    margin: 12px 0;
+    justify-content: space-between;
+}
+
+.timestamps {
+    margin-top: 8px;
+}
+
+.timestamps,
+.usernames {
+    font-size: 14px;
+}
+
+.comments {
+    font-size: 16px;
+    margin-top: 6px;
+}
+
+.iconBox {
+    display: flex;
+}
+
+.del {
+    color: rgb(207, 4, 4);
+    padding: 2px 4px;
+    font-size: 20px;
+    height: 24px;
+    cursor: pointer;
+    margin-right: 6px;
+}
+
+#editModel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+#editModel form {
+    background-color: white;
+    width: 80%;
+    padding: 6px 8px;
+}
+
+#commentIdInput,
+#commentBy {
+    display: none;
+}
+
+#editButtons {
+    display: flex;
+    margin-top: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.editButton {
+    width: 130px;
+    align-self: center;
+    margin: 12px 0 12px 16px;
+    font-size: 20px;
+}

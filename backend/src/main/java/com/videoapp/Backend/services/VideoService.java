@@ -1,6 +1,7 @@
 package com.videoapp.Backend.services;
 
 import com.videoapp.Backend.dto.GetHomeVideosDTO;
+import com.videoapp.Backend.dto.VideoInfoDTO;
 import com.videoapp.Backend.dto.VideoStreamDTO;
 import com.videoapp.Backend.dto.VideoUploadDTO;
 import com.videoapp.Backend.models.Video;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
@@ -46,6 +52,16 @@ public class VideoService {
  @Value("${spring.servlet.multipart.location}")
  private String tempUploadPath;
 
+ public ResponseEntity<VideoInfoDTO> getVidInfo(Integer videoId){
+  Optional<Video> foundVideo = videoRepository.findById(videoId);
+  if (foundVideo.isPresent()){
+   Video video = foundVideo.get();
+   VideoInfoDTO videoInfoDTO = new VideoInfoDTO(video.getVideoId(), video.getDescription(), video.getTitle(), video.getUploadedBy(), video.getTimestamp());
+   return ResponseEntity.ok(videoInfoDTO);
+  }
+  return ResponseEntity.status(404).body(null);
+ }
+
  public List<GetHomeVideosDTO> getRecentVideos() {
   List<Video> videos = videoRepository.findTop20ByOrderByTimestampDesc();
 
@@ -53,7 +69,7 @@ public class VideoService {
   List<GetHomeVideosDTO> getHomeVideosDTOs = new ArrayList<>();
   for (Video video : videos) {
    // Create a new GetHomeVideosDTO object.
-   GetHomeVideosDTO getHomeVideosDTO = new GetHomeVideosDTO(video.getVideoId(), video.getTitle(), video.getUploadedBy(), video.getTimestamp(), video.getThumbnail());
+   GetHomeVideosDTO getHomeVideosDTO = new GetHomeVideosDTO(video.getVideoId(), video.getTitle(), video.getDescription(), video.getUploadedBy(), video.getTimestamp(), video.getThumbnail());
 
    // Add the GetHomeVideosDTO object to the list.
    getHomeVideosDTOs.add(getHomeVideosDTO);
@@ -116,7 +132,8 @@ public class VideoService {
   }
  }
 
- public VideoStreamDTO streamVideo(Integer videoId, String rangeHeader) throws IOException {
+ public VideoStreamDTO streamVideo(Integer videoId, String rangeHeader)
+         throws IOException, ExecutionException, InterruptedException {
   // Fetch video details from the database
   Video video = videoRepository.findById(videoId)
           .orElseThrow(() -> new IOException("Video not found"));
@@ -124,7 +141,6 @@ public class VideoService {
   String videoPath = video.getVideoPath();
   File videoFile = new File(videoPath);
 
-  System.out.println(videoPath);
   if (!videoFile.exists()) {
    throw new IOException("Video file not found");
   }
@@ -140,11 +156,25 @@ public class VideoService {
    }
   }
 
-  // Read the chunk from the video file
-  try (RandomAccessFile raf = new RandomAccessFile(videoFile, "r")) {
-   byte[] chunk = new byte[(int) (end - start + 1)];
-   raf.seek(start);
-   raf.readFully(chunk);
+  // Open the video file for asynchronous reading
+  try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
+          Paths.get(videoPath), StandardOpenOption.READ)) {
+
+   ByteBuffer buffer = ByteBuffer.allocate((int) (end - start + 1));
+
+   // Read the chunk from the video file
+   Future<Integer> result = afc.read(buffer, start);
+
+   // Wait for the read operation to complete
+   int bytesRead = result.get();
+
+   if (bytesRead <= 0) {
+    throw new IOException("No bytes read from file");
+   }
+
+   buffer.flip();
+   byte[] chunk = new byte[bytesRead];
+   buffer.get(chunk);
 
    // Create a ByteArrayResource to hold the chunk of video
    Resource resource = new ByteArrayResource(chunk);

@@ -6,6 +6,8 @@ public class GetHomeVideosDTO {
 
     private Integer videoId;
     private String title;
+
+    private String videoDescription;
     private String uploadedBy;
 
     private LocalDateTime uploadedAt;
@@ -16,9 +18,10 @@ public class GetHomeVideosDTO {
         super();
     }
 
-    public GetHomeVideosDTO(Integer videoId,String title, String uploadedBy, LocalDateTime uploadedAt,  byte[] thumbnail){
+    public GetHomeVideosDTO(Integer videoId,String title, String videoDescription, String uploadedBy, LocalDateTime uploadedAt,  byte[] thumbnail){
         this.videoId = videoId;
         this.title = title;
+        this.videoDescription = videoDescription;
         this.uploadedBy = uploadedBy;
         this.uploadedAt = uploadedAt;
         this.thumbnail = thumbnail;
@@ -34,6 +37,14 @@ public class GetHomeVideosDTO {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getVideoDescription() {
+        return videoDescription;
+    }
+
+    public void setVideoDescription(String videoDescription) {
+        this.videoDescription = videoDescription;
     }
 
     public void setTitle(String title) {

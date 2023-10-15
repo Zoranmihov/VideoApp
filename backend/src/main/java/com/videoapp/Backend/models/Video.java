@@ -14,7 +14,7 @@ public class Video {
     private Integer videoId;
 
     private String title;
-
+    @Column(name = "description", columnDefinition="TEXT")
     private String description;
 
     @Column(name = "video_path")
@@ -41,6 +41,10 @@ public class Video {
 
     public Integer getVideoId() {
         return videoId;
+    }
+
+    public void setVideoId(Integer videoId) {
+        this.videoId = videoId;
     }
 
     public String getTitle() {

@@ -1,0 +1,10 @@
+.menuIcon{
+    height: 32px;
+    width: 35px;
+    cursor: pointer;
+    margin-top: -5px;
+}
+
+.menuIcon:hover{
+    color: black;
+}

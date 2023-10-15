@@ -100,7 +100,6 @@ export const videoUpload = (event) => {
             }, 1300)
         })
         .catch(err => {
-            console.log(err.response.data)
             const status = document.querySelector("#uploadError")
             document.querySelector("#uploadTitle").style.color = "red"
             status.innerHTML = 'Upload failed please contact support.'
