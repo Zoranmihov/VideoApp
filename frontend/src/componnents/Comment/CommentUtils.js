@@ -78,7 +78,6 @@ export const editComment = (e, user, resetComments) => {
         role: user.role
     }, { withCredentials: true }).then(res => {
         resetComments();
-
     }).catch(err => {
         let error = document.querySelector("#editError");
         error.style.display = "block";

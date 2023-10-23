@@ -1,5 +1,6 @@
 package com.videoapp.Backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,9 @@ public class Comment {
     @Column(name = "comment_id")
     private Integer commentId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "video_id", referencedColumnName = "video_id")
+    @JsonIgnore
     private Video video;
 
     @Column(name = "content", columnDefinition="TEXT")

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, json } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -10,6 +10,9 @@ import Index from './pages/index/Index.jsx';
 import Loading from './pages/Loading/Loading';
 import UploadVideo from './pages/UploadVideo/UploadVideo';
 import VideoPlayer from './pages/videoPlayer/VideoPlayer';
+import SearchPage from './pages/SearchPage/SearchPage';
+import UserProfile from './pages/UserPage/UserProfile.jsx';
+import Avatar from './componnents/Avatar/Avatar';
 
 // Guards
 import ProtectedRoutes from './componnents/protectedRoutes/ProtectedRoutes';
@@ -21,29 +24,34 @@ import AppContext from './context/AppContext';
 function App() {
   let { user, setUser } = useContext(AppContext);
   let [loading, setLoading] = useState(true);
+  const [searchKey, setSearchKey] = useState(0);
+
+  const resetSearch = () => {
+    setSearchKey(prevKey => prevKey + 1);
+};
 
 
    useEffect(() => {
   /* Set automated login */
-   axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
-     setUser(res.data)
-     setLoading(false)
-   }).catch(err => {
-     console.log(err)
-     setLoading(false)
-   })
+  //  axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
+  //    setUser(res.data)
+  //    setLoading(false)
+  //  }).catch(err => {
+  //    console.log(err)
+  //    setLoading(false)
+  //  })
 
 
-  // axios.post('https://localhost:8443/auth/userinfo', {}, {
-  //   withCredentials: true,
-  // }).then(res => {
-  //   setUser(res.data)
-  //   setLoading(false)
-  // }).catch(err => {
-  //   console.log(err)
-  //   setUser({})
-  //   setLoading(false)
-  // })
+  axios.post('https://localhost:8443/auth/userinfo', {}, {
+    withCredentials: true,
+  }).then(res => {
+    setUser(res.data)
+    setLoading(false)
+  }).catch(err => {
+    console.log(err)
+    setUser({})
+    setLoading(false)
+  })
 
     }, []);
 
@@ -51,14 +59,16 @@ function App() {
     <>
       {loading ? (<Loading />) : (
         <>
-          <Nav user={user} setUser={setUser} />
           <BrowserRouter>
+          <Nav user={user} setUser={setUser} />
             <Routes>
               <Route index element={<Index />} />
               <Route path='/videoplayer/:videoId' element={<VideoPlayer />} />
+              <Route path='/search/:search' element={<SearchPage key={searchKey} resetSearch={resetSearch} />} />
               {/* Protected routes   */}
               <Route element={<ProtectedRoutes username={user.username} />}>
                 <Route path='/upload' element={<UploadVideo />} />
+                <Route path='/userprofile' element={<UserProfile />} />
               </Route>
             </Routes>
           </BrowserRouter>

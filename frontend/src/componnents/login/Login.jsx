@@ -1,10 +1,12 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import "./login.css"
 
 import axios from 'axios';
-
+import AppContext from '../../context/AppContext';
 
 export default function Login({ formToggle, setFormToggle, setUser }) {
+
+  let {setJwtToken} = useContext(AppContext);
 
   let loginUser = async (event) => {
     event.preventDefault();
@@ -18,11 +20,12 @@ export default function Login({ formToggle, setFormToggle, setUser }) {
 
     axios.post('https://localhost:8443/auth/login', { username, password }, { withCredentials: true }).then(res => {
       document.querySelector("#title").innerHTML = "Welcome";
-      setUser(res.data)
+      setJwtToken(res.data.jwt);
+      setUser(res.data);
       setTimeout(() => {
         document.querySelector("#formModal").style.display = "none";
         document.querySelector("#loginForm").reset();
-      }, 1800)
+      }, 1100)
     }).catch(err => {
       document.querySelector("#title").style.color = 'red';
       let loginError = document.querySelector("#loginError")

@@ -1,17 +1,15 @@
 package com.videoapp.Backend.controllers;
 
-import com.videoapp.Backend.dto.GetHomeVideosDTO;
+import com.videoapp.Backend.dto.GetVideosDTO;
 import com.videoapp.Backend.dto.VideoInfoDTO;
 import com.videoapp.Backend.dto.VideoStreamDTO;
 import com.videoapp.Backend.models.Comment;
+import com.videoapp.Backend.models.Video;
 import com.videoapp.Backend.services.CommentService;
 import com.videoapp.Backend.services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +29,7 @@ public class VideoConteroller {
     private CommentService commentService;
 
     @GetMapping("/all")
-    public List<GetHomeVideosDTO> getRecent() {
+    public List<GetVideosDTO> getRecent() {
         return videoService.getRecentVideos();
     }
 
@@ -56,5 +54,11 @@ public class VideoConteroller {
     @GetMapping("/getcomments/{videoId}")
     public ResponseEntity<Page<Comment>> getVideoComments(@PathVariable Integer videoId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return commentService.getcomments(videoId, page, size);
+    }
+
+    @GetMapping("/search/{term}")
+    public ResponseEntity<Page<GetVideosDTO>> getVideoComments(@PathVariable String term, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        System.out.println(term);
+        return videoService.searchVideos(term, page, size);
     }
 }

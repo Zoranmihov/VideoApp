@@ -1,8 +1,11 @@
 package com.videoapp.Backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "videos")
@@ -23,8 +26,12 @@ public class Video {
     private byte[] thumbnail;
     @Column(name = "uploaded_by")
     private String uploadedBy;
+    @JsonIgnore
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     private LocalDateTime timestamp;
+
 
     public Video(){
         super();
@@ -85,6 +92,14 @@ public class Video {
 
     public void setUploadedBy(String uploadedBy) {
         this.uploadedBy = uploadedBy;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public LocalDateTime getTimestamp() {

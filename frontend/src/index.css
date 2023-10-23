@@ -14,6 +14,12 @@
   box-sizing: border-box;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+
 .robotoFont {
 font-family: 'Roboto', sans-serif;;
 }
@@ -27,4 +33,13 @@ font-family: 'Roboto', sans-serif;;
   color: rgb(210, 0, 0);
   align-self: flex-start;
   display: none;
+}
+
+.del {
+  color: rgb(207, 4, 4);
+  padding: 2px 4px;
+  font-size: 20px;
+  height: 24px;
+  cursor: pointer;
+  margin-right: 6px;
 }

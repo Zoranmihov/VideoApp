@@ -34,17 +34,21 @@ public class ApplicationUser implements UserDetails {
     )
     private Set<Role> authorities;
 
+    @Column(name = "avatar", columnDefinition = "longblob")
+    private byte[] avatar;
+
     public ApplicationUser(){
         super();
         this.authorities = new HashSet<Role>();
     }
 
-    public ApplicationUser(Integer userID, String username, String password, Set<Role> authorities) {
+    public ApplicationUser(Integer userID, String username, String password, Set<Role> authorities, byte[] avatar) {
         super();
         this.userID = userID;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+        this.avatar = avatar;
     }
 
     public Integer getUserID() {
@@ -103,5 +107,13 @@ public class ApplicationUser implements UserDetails {
 
     public  void  setIsEnabled(boolean value) {
         this.isEnabled = value;
+    }
+
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
     }
 }

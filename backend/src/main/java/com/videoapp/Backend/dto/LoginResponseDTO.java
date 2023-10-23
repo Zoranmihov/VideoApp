@@ -6,6 +6,8 @@ public class LoginResponseDTO {
     private String role;
     private String jwt;
 
+
+
     public LoginResponseDTO(){
         super();
     }

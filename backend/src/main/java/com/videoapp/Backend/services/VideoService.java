@@ -1,10 +1,8 @@
 package com.videoapp.Backend.services;
 
-import com.videoapp.Backend.dto.GetHomeVideosDTO;
-import com.videoapp.Backend.dto.VideoInfoDTO;
-import com.videoapp.Backend.dto.VideoStreamDTO;
-import com.videoapp.Backend.dto.VideoUploadDTO;
+import com.videoapp.Backend.dto.*;
 import com.videoapp.Backend.models.Video;
+import com.videoapp.Backend.repositories.CommentRepository;
 import com.videoapp.Backend.repositories.VideoRepository;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
@@ -12,6 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -23,12 +26,12 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +49,11 @@ public class VideoService {
  @Autowired
  private VideoRepository videoRepository;
 
+ @Autowired
+ CommentRepository commentRepository;
+
+
+
  @Value("${upload.path.base}")
  private String baseUploadPath;
 
@@ -62,21 +70,28 @@ public class VideoService {
   return ResponseEntity.status(404).body(null);
  }
 
- public List<GetHomeVideosDTO> getRecentVideos() {
+ public ResponseEntity<Page<GetVideosDTO>> searchVideos(String searchTerm, Integer page, Integer size) {
+  Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+  Page<Video> videosPage = videoRepository.findByTitleContainingIgnoreCase(searchTerm, pageable);
+  Page<GetVideosDTO> dtoPage = videosPage.map(GetVideosDTO::fromVideo);
+  return ResponseEntity.ok(dtoPage);
+ }
+
+ public List<GetVideosDTO> getRecentVideos() {
   List<Video> videos = videoRepository.findTop20ByOrderByTimestampDesc();
 
-  // Create a list of GetHomeVideosDTO objects from the list of Video objects.
-  List<GetHomeVideosDTO> getHomeVideosDTOs = new ArrayList<>();
+  // Create a list of GetVideosDTO objects from the list of Video objects.
+  List<GetVideosDTO> getVideosDTOS = new ArrayList<>();
   for (Video video : videos) {
-   // Create a new GetHomeVideosDTO object.
-   GetHomeVideosDTO getHomeVideosDTO = new GetHomeVideosDTO(video.getVideoId(), video.getTitle(), video.getDescription(), video.getUploadedBy(), video.getTimestamp(), video.getThumbnail());
+   // Create a new GetVideosDTO object.
+   GetVideosDTO getVideosDTO = new GetVideosDTO(video.getVideoId(), video.getTitle(), video.getDescription(), video.getUploadedBy(), video.getTimestamp(), video.getThumbnail());
 
-   // Add the GetHomeVideosDTO object to the list.
-   getHomeVideosDTOs.add(getHomeVideosDTO);
+   // Add the GetVideosDTO object to the list.
+   getVideosDTOS.add(getVideosDTO);
   }
 
-  // Return the list of GetHomeVideosDTO objects.
-  return getHomeVideosDTOs;
+  // Return the list of GetVideosDTO objects.
+  return getVideosDTOS;
  }
 
  @Async
@@ -184,6 +199,71 @@ public class VideoService {
   }
  }
 
+ public ResponseEntity<String> delVideo(DeleteVideoDTO deleteVideoDTO) {
+  if (!deleteVideoDTO.getUploadedBy().equals(deleteVideoDTO.getUserName()) || !deleteVideoDTO.getUserRole().equals("admin"))
+  {
+   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have permission to do this");
+  }
+   Optional<Video> video = videoRepository.findById(deleteVideoDTO.getVideoId());
+   if(video.isPresent()){
+    String videoPathStr = video.get().getVideoPath();  // Assuming getVideoPath() returns the video path as a String
+    Path videoPath = Paths.get(videoPathStr).getParent();
+
+    try {
+     Files.walk(videoPath)
+             .sorted(Comparator.reverseOrder())  // Important to delete contents before the directory itself
+             .map(Path::toFile)
+             .forEach(File::delete);
+    } catch (IOException e) {
+     e.printStackTrace();
+     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete video directory");
+    }
+
+    videoRepository.delete(video.get());
+    return ResponseEntity.ok("Done");
+   } else {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something went wrong or video wasn't found");
+   }
+ }
+
+ public ResponseEntity<String> editVideo(EditVideoDTO editVideoDTO) {
+  if (!editVideoDTO.getUploadedBy().equals(editVideoDTO.getUsername()) || !editVideoDTO.getUserRole().equals("admin"))
+  {
+   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have permission to do this");
+  }
+
+  Optional<Video> foundVideo = videoRepository.findById(editVideoDTO.getVideoId());
+   if(foundVideo.isPresent())
+   {
+    Video video = foundVideo.get();
+    video.setTitle(editVideoDTO.getTitle());
+    video.setDescription(editVideoDTO.getDescription());
+    videoRepository.save(video);
+    return ResponseEntity.ok("Done");
+   }
+   return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Video was not found");
+ }
+
+ public byte[] extractThumbnailBytes(Path convertedVideoPath) throws IOException {
+  FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(convertedVideoPath.toString());
+  grabber.start();
+
+  // Grab the first frame
+  Frame frame = grabber.grabImage();
+
+  // Use JavaCV's FrameToImage to convert the Frame to a BufferedImage
+  Java2DFrameConverter converter = new Java2DFrameConverter();
+  BufferedImage thumbnailImage = converter.convert(frame);
+
+  // Use Java's ImageIO to write the BufferedImage to a ByteArrayOutputStream
+  ByteArrayOutputStream baos = new ByteArrayOutputStream();
+  ImageIO.write(thumbnailImage, "jpg", baos);
+  byte[] thumbnailBytes = baos.toByteArray();
+
+  grabber.stop();
+
+  return thumbnailBytes;
+ }
 
  private Path convertAndResizeVideo(Path videoPath) throws IOException {
   String inputVideoPath = videoPath.toString();
@@ -249,28 +329,6 @@ public class VideoService {
 
   return Paths.get(outputVideoPath);
  }
-
- public byte[] extractThumbnailBytes(Path convertedVideoPath) throws IOException {
-  FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(convertedVideoPath.toString());
-  grabber.start();
-
-  // Grab the first frame
-  Frame frame = grabber.grabImage();
-
-  // Use JavaCV's FrameToImage to convert the Frame to a BufferedImage
-  Java2DFrameConverter converter = new Java2DFrameConverter();
-  BufferedImage thumbnailImage = converter.convert(frame);
-
-  // Use Java's ImageIO to write the BufferedImage to a ByteArrayOutputStream
-  ByteArrayOutputStream baos = new ByteArrayOutputStream();
-  ImageIO.write(thumbnailImage, "jpg", baos);
-  byte[] thumbnailBytes = baos.toByteArray();
-
-  grabber.stop();
-
-  return thumbnailBytes;
- }
-
 
  private void clearTempDirectory(String username) {
   Path absoluteTempDirectory = Paths.get(tempUploadPath).toAbsolutePath();

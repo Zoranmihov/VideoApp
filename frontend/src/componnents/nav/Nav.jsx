@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import "./nav.css";
-
-import avatar from '../../assets/avatar.jpg'
 
 // Components
 import Login from '../login/Login';
 import Register from '../register/Register';
 import UserMenu from '../UserMenu/UserMenu';
 import SearchIcon from '../SearchIcon/SearchIcon';
+import Avatar from '../Avatar/Avatar';
 
-export default function Nav({user, setUser}) {
+export default function Nav({ user, setUser }) {
 
   const [formToggle, setFormToggle] = useState(false);
   const [modalKey, setModalKey] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const setAvatarSrc = (base64String) => {
+      document.getElementById('avatarNav').src = `data:image/jpeg;base64,${base64String}`;
+    };
+
+    if (user.avatar) {
+      setAvatarSrc(user.avatar);
+    }
+  }, [user.avatar]);
+
+
+
 
   const openModal = () => {
     document.querySelector("#formModal").style.display = "flex";
@@ -27,12 +41,12 @@ export default function Nav({user, setUser}) {
   }
 
   const toggleUserMenu = () => {
-    if(document.querySelector("#userMenu").style.display === "flex") {
+    if (document.querySelector("#userMenu").style.display === "flex") {
 
-      document.querySelector("#userMenu").style.display = "none";  
+      document.querySelector("#userMenu").style.display = "none";
 
     } else {
-      document.querySelector("#userMenu").style.display = "flex";  
+      document.querySelector("#userMenu").style.display = "flex";
 
     }
   }
@@ -43,16 +57,32 @@ export default function Nav({user, setUser}) {
         <div id='menuIcon' className='imgAlign'>
           <a href="/" className='nav-links titlesFont' id='logo'>VideoApp</a>
         </div>
-        <div className='paddingAlign imgAlign'>
-          <input placeholder='Search' type="text" name="videoTitle" id="" />
-          <button id='searchBtn'>
-            <SearchIcon />
-          </button>
-        </div>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          navigate("/search/" + e.target.videoTitle.value);
+        }}>
+          <div className='paddingAlign imgAlign'>
+            <input placeholder='Search' type="text" name="videoTitle" id="" />
+            <button type='submit' id='searchBtn'>
+              <SearchIcon />
+            </button>
+          </div>
+        </form>
         {user.username ? (
           <div className='paddingAlign' id='userInfo'>
             <UserMenu username={user.username} />
-            <img id='avatar' src={avatar} alt="Profile Avatar"  onClick={toggleUserMenu}/>
+            <div id='avatar' onClick={toggleUserMenu}>
+              {user.avatar ? (
+                <img
+                  src=""
+                  alt="User Avatar"
+                  loading="lazy"
+                  id='avatarNav'
+                />
+              ) : (
+                <Avatar width={"35px"} height={"35px"} />
+              )}
+            </div>
           </div>
         ) : (
           <div className='paddingAlign' id='userInfo'>
@@ -63,8 +93,8 @@ export default function Nav({user, setUser}) {
 
       <div id='formModal'>
         <div id='formContainer' onClick={closeModal}>
-          {formToggle ? 
-            <Register key={modalKey} formToggle={formToggle} setFormToggle={setFormToggle} /> : 
+          {formToggle ?
+            <Register key={modalKey} formToggle={formToggle} setFormToggle={setFormToggle} /> :
             <Login setUser={setUser} key={modalKey} formToggle={formToggle} setFormToggle={setFormToggle} />}
         </div>
       </div>

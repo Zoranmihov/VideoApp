@@ -54,7 +54,9 @@ export const clearForm = (form) => {
 
 }
 
-export const videoUpload = (event) => {
+
+
+export const videoUpload = async (event) => {
     event.preventDefault();
     document.querySelector("#uploadSub").disabled = true;
     const formData = new FormData();
@@ -62,20 +64,8 @@ export const videoUpload = (event) => {
     formData.append('description', event.target.description.value);
     formData.append('video', event.target.video.files[0]);
     if (event.target.thumbnail.files[0]) {
-        // Get the thumbnail file.
-        const thumbnailFile = event.target.thumbnail.files[0];
-
-        // Create a new FileReader object.
-        const reader = new FileReader();
-
-        // Set the onload event handler for the FileReader object.
-        reader.onload = function () {
-            // Get the bytes of the thumbnail file.
-            const thumbnailBytes = reader.result;
-
-            // Append the thumbnail bytes to the FormData object.
-            formData.append('thumbnail', thumbnailBytes);
-        }
+       
+        formData.append('thumbnailFile', event.target.thumbnail.files[0]);
     }
 
     axios.post('https://localhost:8443/user/uploadvideo', formData, {

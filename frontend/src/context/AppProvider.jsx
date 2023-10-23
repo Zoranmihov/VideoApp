@@ -5,6 +5,7 @@ import AppContext from './AppContext';
 const AppProvider = ({ children }) => {
   let [user, setUser] = useState({});
   let [videoDetails, setVideoDetails] = useState({});
+  let [jwtToken, setJwtToken] = useState("");
 
 
   const value = {
@@ -12,6 +13,8 @@ const AppProvider = ({ children }) => {
     setUser,
     videoDetails,
     setVideoDetails,
+    jwtToken,
+    setJwtToken
   };
 
   return (

@@ -1,11 +1,10 @@
 package com.videoapp.Backend.controllers;
 
-import com.videoapp.Backend.dto.DeleteCommentDTO;
-import com.videoapp.Backend.dto.EditCommentDTO;
-import com.videoapp.Backend.dto.LeaveCommentDTO;
-import com.videoapp.Backend.dto.VideoUploadDTO;
+import com.videoapp.Backend.dto.*;
 import com.videoapp.Backend.services.CommentService;
+import com.videoapp.Backend.services.UserService;
 import com.videoapp.Backend.services.VideoService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,6 +30,11 @@ public class UserController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private UserService userService;
+
+
+
     @Value("${spring.servlet.multipart.location}")
     private String tempUploadPath;
 
@@ -38,6 +43,11 @@ public class UserController {
         try {
             if (videoUploadDTO.getVideo().isEmpty()) {
                 return new ResponseEntity<>("Video file cannot be empty.", HttpStatus.BAD_REQUEST);
+            }
+
+            if (videoUploadDTO.getThumbnailFile() != null) {
+                byte[]  thumbnailBytes = videoUploadDTO.getThumbnailFile().getBytes();
+                videoUploadDTO.setThumbnail(thumbnailBytes);
             }
 
             // Convert the relative path to an absolute path
@@ -90,5 +100,24 @@ public class UserController {
     @PutMapping("/editcomment")
     public ResponseEntity<String> editComment(@Valid @RequestBody EditCommentDTO editCommentDTO){
         return commentService.editComment(editCommentDTO);
+    }
+
+    @PostMapping("/delvideo")
+    public ResponseEntity<String> delVideo(@Valid @RequestBody DeleteVideoDTO deleteVideoDTO) {
+        return videoService.delVideo(deleteVideoDTO);
+    }
+
+    @PutMapping("/editvideo")
+    public ResponseEntity<String> editVideo(@Valid @RequestBody EditVideoDTO editVideoDTO) {
+        return videoService.editVideo(editVideoDTO);
+    }
+
+    @PutMapping(value = "/updateuserinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserInfoDTO> editUserInfo(@Valid @ModelAttribute EditUserInfoDTO editUserInfoDTO, Authentication auth, HttpServletResponse response) throws IOException {
+        System.out.println(auth.getName());
+        if (editUserInfoDTO.getAvatar() != null) {
+            editUserInfoDTO.setAvatarBytes(editUserInfoDTO.getAvatar().getBytes());
+        }
+            return userService.editUserInfo(editUserInfoDTO, response);
     }
 }

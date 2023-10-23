@@ -26,19 +26,19 @@ public class VideoUploadDTO {
     private String videoTempPath;
 
     @Nullable
-    private String thumbnailTempPath;
+    private MultipartFile thumbnailFile;
 
     public VideoUploadDTO() {
         super();
     }
 
-    public VideoUploadDTO(String title, String description, MultipartFile video, byte[] thumbnail, String videoTempPath, String thumbnailTempPath) {
+    public VideoUploadDTO(String title, String description, MultipartFile video, byte[] thumbnail, String videoTempPath, MultipartFile thumbnailFile) {
         this.title = title;
         this.description = description;
         this.video = video;
         this.thumbnail = thumbnail;
         this.videoTempPath = videoTempPath;
-        this.thumbnailTempPath = thumbnailTempPath;
+        this.thumbnailFile = thumbnailFile;
     }
 
     public String getTitle() {
@@ -83,12 +83,13 @@ public class VideoUploadDTO {
         this.videoTempPath = videoTempPath;
     }
 
+
     @Nullable
-    public String getThumbnailTempPath() {
-        return thumbnailTempPath;
+    public MultipartFile getThumbnailFile() {
+        return thumbnailFile;
     }
 
-    public void setThumbnailTempPath(@Nullable String thumbnailTempPath) {
-        this.thumbnailTempPath = thumbnailTempPath;
+    public void setThumbnailFile(@Nullable MultipartFile thumbnailFile) {
+        this.thumbnailFile = thumbnailFile;
     }
 }

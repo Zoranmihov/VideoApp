@@ -32,7 +32,10 @@ export default function UserMenu({username}) {
     return(
         <div id='userMenu'>
             <p className='titlesFont' id='username'>{username}</p>
+            
             <a href="/upload">Upload a video</a>
+            <a href="/userprofile">Profile</a>
+
         </div>
     )
 }

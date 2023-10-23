@@ -45,6 +45,7 @@
 @media (max-width: 600px) {
     .videoCard {
         flex-direction: row;
+        width: 100%;
     }
     #infoContainer {
         display: flex;
@@ -54,6 +55,10 @@
 
     .vidInfo {
         flex-direction: column;
+    }
+
+    h2 {
+        font-size: 15px;
     }
 }
 

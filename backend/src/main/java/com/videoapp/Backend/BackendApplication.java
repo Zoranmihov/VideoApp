@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SpringBootApplication
-@EnableAsync
+@EnableAsync(proxyTargetClass=true)
 public class BackendApplication {
 
 	@Value("${upload.path.base}")
@@ -56,7 +56,7 @@ public class BackendApplication {
 			Set<Role> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			ApplicationUser admin = new ApplicationUser(1, "superAdmin", passwordEncoder.encode("password"), roles);
+			ApplicationUser admin = new ApplicationUser(1, "superAdmin", passwordEncoder.encode("password"), roles, null);
 
 			userRepository.save(admin);
 		};

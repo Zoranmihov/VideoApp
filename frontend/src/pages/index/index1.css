@@ -18,9 +18,12 @@
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 680px) {
     #index {
-        grid-template-columns: 1fr; /* 1 column for very small viewports */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 }
 
