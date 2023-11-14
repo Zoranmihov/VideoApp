@@ -13,7 +13,7 @@ public class VideoUploadDTO {
     private String title;
 
     @NotBlank(message = "Description cannot be blank")
-    @Size(max = 1000, message = "Description must be at most 1000 characters")
+    @Size(max = 2000, message = "Description must be at most 2000 characters")
     private String description;
 
     @NotNull(message = "Video file cannot be null")

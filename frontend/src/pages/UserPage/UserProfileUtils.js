@@ -2,13 +2,6 @@ import axios from "axios"
 
 // Did it this way to showcase of advanced state maanged using only js. It's a better alternative to split them into their own components.
 
-/* 
-TO DOS:
-
-1. Inplement password avatar and delete profile check, 
-
-*/
-
 export const toggleWindow = (e, setToggle, toggle) => {
 
     document.querySelectorAll(".navActive").forEach(element => {
@@ -25,10 +18,12 @@ export const updateAvatarPicker = () => {
     document.querySelector("#changeAvatarPicker").click();
 }
 
-export const resetEditForm = (event) => {
+export const resetEditForm = () => {
+    document.body.style.overflow = '';
     document.querySelector("#updateProfileModal").style.display = 'none';
+    toggleSubButton(true);
     toggleUpdateError("", "none");
-    const form = event.target;
+    const form = document.querySelector('#updateProfileForm');
     const inputs = form.querySelectorAll('input');
     inputs.forEach(input => {
         input.style.borderColor = 'black';
@@ -37,6 +32,8 @@ export const resetEditForm = (event) => {
 }
 
 export const openForm = (infoToUpdate) => {
+    document.body.style.overflow = 'hidden';
+    toggleSubButton(true);
     document.querySelector("#targetPicked").value = infoToUpdate;
     switch (infoToUpdate) {
         case "username":
@@ -70,6 +67,7 @@ export const openForm = (infoToUpdate) => {
             document.querySelector("#updateProfileModal").style.display = 'flex';
             break
         case "delete":
+            toggleSubButton(false);
             toggleTextBasedLabel("none")
             toggleFilePicker("none");
             toggleTextInput("none");
@@ -103,9 +101,21 @@ export const subEditForm = (event, username, userRole, setUser) => {
             'Content-Type': 'multipart/form-data'
         }
     }).then(res => {
-        console.log(res)
+        if(res.status == 204) {
+            setTimeout(() => {
+                setUser({});
+                window.location.href = "/";
+                return;
+            }, 100)
+        }
         setUser(res.data);
-    }).catch(err => console.log(err));
+        resetEditForm();
+    }).catch(err => {
+        toggleUpdateError(err.response.data.message, "block");
+        event.target.querySelectorAll('input').forEach(input => {
+            input.value = null;
+        });
+    });
 }
 
 const toggleFilePicker = (display) => {

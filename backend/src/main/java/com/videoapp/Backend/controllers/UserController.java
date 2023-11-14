@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -102,22 +103,30 @@ public class UserController {
         return commentService.editComment(editCommentDTO);
     }
 
-    @PostMapping("/delvideo")
-    public ResponseEntity<String> delVideo(@Valid @RequestBody DeleteVideoDTO deleteVideoDTO) {
-        return videoService.delVideo(deleteVideoDTO);
-    }
-
-    @PutMapping("/editvideo")
-    public ResponseEntity<String> editVideo(@Valid @RequestBody EditVideoDTO editVideoDTO) {
-        return videoService.editVideo(editVideoDTO);
-    }
-
     @PutMapping(value = "/updateuserinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserInfoDTO> editUserInfo(@Valid @ModelAttribute EditUserInfoDTO editUserInfoDTO, Authentication auth, HttpServletResponse response) throws IOException {
-        System.out.println(auth.getName());
+    public ResponseEntity<UserInfoDTO> editUserInfo(@Valid @ModelAttribute EditUserInfoDTO editUserInfoDTO, HttpServletResponse response) throws IOException {
         if (editUserInfoDTO.getAvatar() != null) {
             editUserInfoDTO.setAvatarBytes(editUserInfoDTO.getAvatar().getBytes());
         }
             return userService.editUserInfo(editUserInfoDTO, response);
+    }
+
+    @PutMapping(value = "/updatevideoinfo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> editVideoInfo(@Valid @ModelAttribute EditVideoInfoDTO editVideoInfoDTO, Authentication auth) throws IOException {
+
+        if(!auth.getName().equals(editVideoInfoDTO.getUsername())) {
+            return ResponseEntity.status(404).body("You don't have permission");
+        }
+
+
+        if (editVideoInfoDTO.getThumbnail() != null) {
+            editVideoInfoDTO.setThumbnailBytes(editVideoInfoDTO.getThumbnail().getBytes());
+        }
+        return videoService.editVideoInfo(editVideoInfoDTO);
+    }
+
+    @GetMapping("/allvideos/{username}")
+    public ResponseEntity<Page<GetVideosDTO>> getVideoComments(@PathVariable String username, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return videoService.getUserVideos(username, page, size);
     }
 }

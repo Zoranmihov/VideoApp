@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const delVideo = (videoId, uploadedBy, user, resetSearch) => {
-    axios.post("https://localhost:8443/user/delvideo", {
+    axios.post("https://localhost:8443/admin/delvideo", {
         videoId,
         uploadedBy,
         userName: user.username,
@@ -30,7 +30,7 @@ export const closeVideoEdit = () => {
 
 export const editVideo = (e, user, resetSearch) => {
     e.preventDefault();
-    axios.put("https://localhost:8443/user/editvideo", {
+    axios.put("https://localhost:8443/admin/editvideo", {
         videoId: e.target.videoId.value,
         title: e.target.title.value,
         description: e.target.description.value,

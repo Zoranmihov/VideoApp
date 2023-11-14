@@ -4,10 +4,17 @@ import { toggleWindow, updateAvatarPicker, resetEditForm, openForm, subEditForm,
 
 import AppContext from '../../context/AppContext';
 import Avatar from '../../componnents/Avatar/Avatar';
+import UserVideos from '../../componnents/UserVideos/UserVideos';
 
 export default function UserProfile() {
     let { user, setUser } = useContext(AppContext);
     let [toggle, setToggle] = useState(true);
+
+    const [videosKey, setVideosKey] = useState(0);
+
+  const resetVideos = () => {
+    setVideosKey(prevKey => prevKey + 1);
+};
 
     useEffect(() => {
         const setAvatarSrc = (base64String) => {
@@ -48,7 +55,7 @@ export default function UserProfile() {
                     </div>
 
                     <div id="updateProfileModal">
-                        <form onSubmit={(e) => subEditForm(e, user.username, user.role, setUser)} onReset={e => resetEditForm(e)} >
+                        <form id='updateProfileForm' onSubmit={(e) => subEditForm(e, user.username, user.role, setUser)} onReset={e => resetEditForm()} >
                             <h2 id='updateProfileTitle' className='titlesFont'>Title goes here</h2>
                             <label className='updateLabel' id='textBasedLabel'>Test</label>
                             <p className='avatarPicker' id='editAvatarName'></p>
@@ -59,7 +66,7 @@ export default function UserProfile() {
                             <button className='avatarPicker' id='avatarPickerBtn' type='button' onClick={() => updateAvatarPicker()}>Chose a photo</button>
                             <label className='updateLabel' htmlFor="cPassword">Password:</label>
                             <input type="password" name='cPassword' required />
-                            <div>
+                            <div className='changeButtonContainer'>
                                 <button disabled id='ChangeSubBtn' type='submit'>Update</button>
                                 <button type='reset'>Cancel</button>
                             </div>
@@ -68,7 +75,7 @@ export default function UserProfile() {
                 </div>
             ) : (
                 <div>
-                    <h1>Videos page goes here</h1>
+                    < UserVideos key={videosKey} resetVideos={resetVideos} username={user.username} />
                 </div>
             )}
         </>

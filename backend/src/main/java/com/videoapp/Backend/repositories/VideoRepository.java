@@ -12,5 +12,8 @@ import java.util.List;
 public interface VideoRepository extends JpaRepository<Video, Integer> {
      List<Video> findTop20ByOrderByTimestampDesc();
      Page<Video> findByTitleContainingIgnoreCase(String searchTerm, Pageable pageable);
+
+     Page<Video> findByUploadedBy(String uploadedBy, Pageable pageable);
+
      List<Video> findByUploadedBy(String uploadedBy);
 }

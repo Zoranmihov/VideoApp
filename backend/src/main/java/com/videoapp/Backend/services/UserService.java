@@ -84,6 +84,7 @@ public class UserService implements UserDetailsService {
             if(!passwordEncoder.matches(editUserInfoDTO.getPassword(), user.getPassword())) {
                 return new ResponseEntity<UserInfoDTO>(new UserInfoDTO(null, null, null, null, "Invalid password"), HttpStatus.BAD_REQUEST);
             }
+
             Set<Role> roles = (Set<Role>) user.getAuthorities();
             Optional<Role> roleOptional = roles.stream().findFirst();
             String role =  roleOptional.get().getAuthority();
@@ -92,7 +93,11 @@ public class UserService implements UserDetailsService {
 
             switch (editUserInfoDTO.getTarget()){
                 case "username":
-                    user.setUsername(editUserInfoDTO.getData());
+                    if(userRepository.existsByUsername(editUserInfoDTO.getData())){
+                        return new ResponseEntity<UserInfoDTO>(new UserInfoDTO(null, null, null, null, "Username is taken"), HttpStatus.BAD_REQUEST);
+
+                    }
+                        user.setUsername(editUserInfoDTO.getData());
                     userRepository.save(user);
                     Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), editUserInfoDTO.getPassword()));
                     String token = tokenService.generateJwt(auth);

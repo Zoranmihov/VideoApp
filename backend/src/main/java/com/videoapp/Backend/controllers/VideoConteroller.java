@@ -1,12 +1,11 @@
 package com.videoapp.Backend.controllers;
 
-import com.videoapp.Backend.dto.GetVideosDTO;
-import com.videoapp.Backend.dto.VideoInfoDTO;
-import com.videoapp.Backend.dto.VideoStreamDTO;
+import com.videoapp.Backend.dto.*;
 import com.videoapp.Backend.models.Comment;
 import com.videoapp.Backend.models.Video;
 import com.videoapp.Backend.services.CommentService;
 import com.videoapp.Backend.services.VideoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -58,7 +57,9 @@ public class VideoConteroller {
 
     @GetMapping("/search/{term}")
     public ResponseEntity<Page<GetVideosDTO>> getVideoComments(@PathVariable String term, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        // Improve search videos
         System.out.println(term);
         return videoService.searchVideos(term, page, size);
     }
+
 }

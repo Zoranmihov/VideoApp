@@ -33,13 +33,13 @@ function App() {
 
    useEffect(() => {
   /* Set automated login */
-  //  axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
-  //    setUser(res.data)
-  //    setLoading(false)
-  //  }).catch(err => {
-  //    console.log(err)
-  //    setLoading(false)
-  //  })
+   axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
+     setUser(res.data)
+     setLoading(false)
+   }).catch(err => {
+     console.log(err)
+     setLoading(false)
+   })
 
 
   axios.post('https://localhost:8443/auth/userinfo', {}, {

@@ -22,8 +22,8 @@ export default function Index() {
     {videos ? (
           <div id='index'>
           {
-          videos.map(video => {
-            return <VideoCard key={video.id} videoData={video} />
+          videos.map((video, index) => {
+            return <VideoCard key={index} videoData={video} />
           })}
     
         </div>

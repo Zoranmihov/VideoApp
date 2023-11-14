@@ -1,9 +1,12 @@
 package com.videoapp.Backend.services;
 
 import com.videoapp.Backend.dto.*;
+import com.videoapp.Backend.models.ApplicationUser;
+import com.videoapp.Backend.models.Role;
 import com.videoapp.Backend.models.Video;
 import com.videoapp.Backend.repositories.CommentRepository;
 import com.videoapp.Backend.repositories.VideoRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +35,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -73,6 +75,13 @@ public class VideoService {
  public ResponseEntity<Page<GetVideosDTO>> searchVideos(String searchTerm, Integer page, Integer size) {
   Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
   Page<Video> videosPage = videoRepository.findByTitleContainingIgnoreCase(searchTerm, pageable);
+  Page<GetVideosDTO> dtoPage = videosPage.map(GetVideosDTO::fromVideo);
+  return ResponseEntity.ok(dtoPage);
+ }
+
+ public ResponseEntity<Page<GetVideosDTO>> getUserVideos(String username, Integer page, Integer size) {
+  Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+  Page<Video> videosPage = videoRepository.findByUploadedBy(username, pageable);
   Page<GetVideosDTO> dtoPage = videosPage.map(GetVideosDTO::fromVideo);
   return ResponseEntity.ok(dtoPage);
  }
@@ -243,6 +252,44 @@ public class VideoService {
    }
    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Video was not found");
  }
+
+ public ResponseEntity<String> editVideoInfo(EditVideoInfoDTO editVideoInfoDTO){
+
+  Optional<Video> video = videoRepository.findById(editVideoInfoDTO.getVideoId());
+
+  if (!video.isPresent()) {
+   return ResponseEntity.status(404).body("Video doesn't exsist");
+  }
+
+   Video foundvideo = video.get();
+
+
+  switch (editVideoInfoDTO.getAction()){
+   case "title":
+    foundvideo.setTitle(editVideoInfoDTO.getData());
+    return ResponseEntity.status(200).body("Title was updated");
+
+   case "description":
+    foundvideo.setDescription(editVideoInfoDTO.getData());
+    return ResponseEntity.status(200).body("Description was updated");
+
+
+   case "thumbnail":
+    foundvideo.setThumbnail(editVideoInfoDTO.getThumbnailBytes());
+    return ResponseEntity.status(200).body("Thumbnail was updated");
+
+
+   case "delete":
+   videoRepository.delete(foundvideo);
+    return ResponseEntity.status(200).body("Video was deleted");
+
+   default:
+    return ResponseEntity.status(400).body("Something went wrong please try again");
+
+  }
+
+ }
+
 
  public byte[] extractThumbnailBytes(Path convertedVideoPath) throws IOException {
   FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(convertedVideoPath.toString());
