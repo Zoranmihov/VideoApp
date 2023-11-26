@@ -280,6 +280,18 @@ public class VideoService {
 
 
    case "delete":
+    String videoPathStr = foundvideo.getVideoPath();
+    Path videoPath = Paths.get(videoPathStr).getParent();
+
+    try {
+     Files.walk(videoPath)
+             .sorted(Comparator.reverseOrder())  // Important to delete contents before the directory itself
+             .map(Path::toFile)
+             .forEach(File::delete);
+    } catch (IOException e) {
+     e.printStackTrace();
+     return ResponseEntity.status(500).body("Failed to delete video directory");
+    }
    videoRepository.delete(foundvideo);
     return ResponseEntity.status(200).body("Video was deleted");
 
