@@ -56,9 +56,7 @@ public class VideoConteroller {
     }
 
     @GetMapping("/search/{term}")
-    public ResponseEntity<Page<GetVideosDTO>> getVideoComments(@PathVariable String term, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        // Improve search videos
-        System.out.println(term);
+    public ResponseEntity<Page<GetVideosDTO>> searchVideos(@PathVariable String term, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return videoService.searchVideos(term, page, size);
     }
 

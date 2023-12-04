@@ -1,7 +1,9 @@
 package com.videoapp.Backend.services;
 
 import com.videoapp.Backend.dto.EditUserInfoDTO;
+import com.videoapp.Backend.dto.SearchUsersDTO;
 import com.videoapp.Backend.dto.UserInfoDTO;
+import com.videoapp.Backend.dto.UserProfileDTO;
 import com.videoapp.Backend.models.ApplicationUser;
 import com.videoapp.Backend.models.Comment;
 import com.videoapp.Backend.models.Role;
@@ -13,10 +15,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +30,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Pageable;
+
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -78,7 +84,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User doesn't exist"));
     }
 
-        public ResponseEntity<UserInfoDTO> editUserInfo(EditUserInfoDTO editUserInfoDTO, HttpServletResponse response){
+    public ResponseEntity<UserInfoDTO> editUserInfo(EditUserInfoDTO editUserInfoDTO, HttpServletResponse response){
             ApplicationUser user = userRepository.findByUsername(editUserInfoDTO.getUsername()).get();
             // Check if passwords match before fetching the rest of the user data
             if(!passwordEncoder.matches(editUserInfoDTO.getPassword(), user.getPassword())) {
@@ -130,6 +136,24 @@ public class UserService implements UserDetailsService {
             }
 
         }
+
+    public ResponseEntity<Page<SearchUsersDTO>>searchUsers(String searchTerm, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "username")); // Sorting by username
+        Page<ApplicationUser> usersPage = userRepository.findByUsernameContainingIgnoreCaseCustom(searchTerm, pageable);
+        Page<SearchUsersDTO> dtoPage = usersPage.map(user -> new SearchUsersDTO(user.getUsername(), user.getAvatar()));
+        return ResponseEntity.ok(dtoPage);
+    }
+
+    public ResponseEntity<UserProfileDTO>searchUserProfile(String username, Integer page, Integer size) {
+        Optional<ApplicationUser> foundUser = userRepository.findByUsername(username);
+        if(foundUser.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        ApplicationUser user = foundUser.get();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Video> videos = videoRepository.findByUploadedBy(username, pageable);
+        return ResponseEntity.ok(new UserProfileDTO(user.getUsername(), user.getAvatar(),videos));
+    }
 
     private byte[] resizeAvatar(byte[] avatarBytes, MultipartFile image){
             try {

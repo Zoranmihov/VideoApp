@@ -56,24 +56,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-         http
-                 .cors().and()
+        http
+                .cors().and()
                 .csrf(csrf -> csrf.disable())
-                 .addFilterBefore(new BearerFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+                .addFilterBefore(new BearerFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/userinfo").authenticated();
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/videos/**").permitAll();
+                    auth.requestMatchers("/user/profile/**").permitAll();
+                    auth.requestMatchers("/user/search/**").permitAll();
                     auth.requestMatchers("/admin/**").hasRole("ADMIN");
-                    auth.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN");
+                    auth.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN"); // Secured routes under /user
                     auth.anyRequest().authenticated();
                 })
                 .oauth2ResourceServer()
-                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                 .jwt()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .jwt()
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
-         
+
         return http.build();
     }
 

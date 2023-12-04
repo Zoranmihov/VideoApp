@@ -126,7 +126,17 @@ public class UserController {
     }
 
     @GetMapping("/allvideos/{username}")
-    public ResponseEntity<Page<GetVideosDTO>> getVideoComments(@PathVariable String username, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<GetVideosDTO>> getAllVideos(@PathVariable String username, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         return videoService.getUserVideos(username, page, size);
+    }
+
+    @GetMapping("/search/{term}")
+    public ResponseEntity<Page<SearchUsersDTO>> searchUsers(@PathVariable String term, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return userService.searchUsers(term, page, size);
+    }
+
+        @GetMapping("/profile/{username}")
+    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable String username, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return userService.searchUserProfile(username, page, size);
     }
 }

@@ -110,7 +110,7 @@ export default function UserVideos({ username, resetVideos }) {
             </div>
           </div>
         ) : (
-          <h2>You have no vides</h2>
+          <h2>You have no videos</h2>
         )
       }
     </>

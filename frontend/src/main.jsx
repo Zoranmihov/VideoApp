@@ -11,8 +11,8 @@ import Loading from './pages/Loading/Loading';
 import UploadVideo from './pages/UploadVideo/UploadVideo';
 import VideoPlayer from './pages/videoPlayer/VideoPlayer';
 import SearchPage from './pages/SearchPage/SearchPage';
-import UserProfile from './pages/UserPage/UserProfile.jsx';
-import Avatar from './componnents/Avatar/Avatar';
+import UserProfile from './pages/UserProfile/UserProfile.jsx';
+import UserPage from './pages/UserPage/UserPage.jsx';
 
 // Guards
 import ProtectedRoutes from './componnents/protectedRoutes/ProtectedRoutes';
@@ -64,6 +64,7 @@ function App() {
             <Routes>
               <Route index element={<Index />} />
               <Route path='/videoplayer/:videoId' element={<VideoPlayer />} />
+              <Route path='/user/:username' element={<UserPage />} />
               <Route path='/search/:search' element={<SearchPage key={searchKey} resetSearch={resetSearch} />} />
               {/* Protected routes   */}
               <Route element={<ProtectedRoutes username={user.username} />}>

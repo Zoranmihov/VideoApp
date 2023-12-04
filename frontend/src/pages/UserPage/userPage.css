@@ -1,0 +1,43 @@
+#userPage {
+    display: flex;
+    flex-direction: column;
+}
+
+#userPageInfo {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+}
+
+#userPage-username {
+    margin-left: 14px;
+}
+
+#hr {
+    margin: 8px 0;
+}
+
+#hr h2 {
+    padding: 0 6px;
+    font-size: 32px;
+}
+
+#hr hr {
+    border: 1px solid black;
+}
+
+#userPageVideos {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.userPageVideoCard {
+    margin: 10px;
+}
+
+@media (max-width: 700px) {
+    #userPageVideos {
+        justify-content: center;
+
+    }
+}

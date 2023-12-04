@@ -1,12 +1,9 @@
 package com.videoapp.Backend.services;
 
 import com.videoapp.Backend.dto.*;
-import com.videoapp.Backend.models.ApplicationUser;
-import com.videoapp.Backend.models.Role;
 import com.videoapp.Backend.models.Video;
 import com.videoapp.Backend.repositories.CommentRepository;
 import com.videoapp.Backend.repositories.VideoRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +69,7 @@ public class VideoService {
 
  public ResponseEntity<Page<GetVideosDTO>> searchVideos(String searchTerm, Integer page, Integer size) {
   Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
-  Page<Video> videosPage = videoRepository.findByTitleContainingIgnoreCase(searchTerm, pageable);
+  Page<Video> videosPage = videoRepository.findByTitleOrDescriptionContainingIgnoreCase(searchTerm, pageable);
   Page<GetVideosDTO> dtoPage = videosPage.map(GetVideosDTO::fromVideo);
   return ResponseEntity.ok(dtoPage);
  }

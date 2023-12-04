@@ -1,0 +1,144 @@
+#searchPage {
+    display: flex;
+    flex-direction: column;
+}
+
+.SearchCard {
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 12px 8px 0 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.SearchCard .videoCard {
+    padding: 8px 12px;
+    flex-direction: row;
+    width: 650px;
+}
+
+.SearchCard .infoContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 12px;
+}
+
+.SearchCard .vidInfo {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.SearchCard .infoContainer h3 {
+    margin: 4px;
+}
+
+#editVideoFormModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+#editVideoFormModal form {
+    width: 90%;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px;
+}
+
+#editVidForm input {
+    margin-top: 12px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    padding: 0 4px;
+    border-bottom: 1px solid black;
+}
+
+.hiddenInput {
+    display: none;
+}
+
+#editVidForm textarea {
+    margin-top: 12px;
+    width: 100%;
+}
+
+#editVidButtons {
+    display: flex;
+    margin-top: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.editVidButton {
+    width: 130px;
+    align-self: center;
+    margin: 12px 0 12px 16px;
+    font-size: 20px;
+}
+
+@media (max-width: 650px) {
+
+    .SearchCard .videoCard {
+        flex-direction: column;
+    }
+
+    .SearchCard .infoContainer {
+        align-items: flex-start;
+        margin-left: 0;
+        padding-top: 8px;
+    }
+
+    .SearchCard .vidInfo {
+        align-items: flex-start;
+        justify-content: flex-start;
+        margin-left: 0;
+        flex-direction: row;
+    }
+
+    .SearchCard h2 {
+        font-size: 24px;
+    }
+
+    .SearchCard .vidInfoUser {
+       margin-right: 12px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+    .SearchCard {
+        flex-direction: column;
+    }
+
+    .SearchCard .videoCard {
+        width: 100%;
+
+    }
+
+    .SearchCard .videoCard div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .SearchCard .titlesFont {
+        margin: 6px 0;
+    }
+
+}
