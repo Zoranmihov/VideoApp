@@ -56,7 +56,7 @@ export default function SearchVideos({ resetSearch, searchTerm }) {
       uploadedBy: video.uploadedBy,
       uploadedAt: video.uploadedAt
     });
-   navigate("/videoplayer/" + video.videoId);;
+   navigate("/videoplayer/" + video.videoId);
   }
 
   return (
@@ -117,7 +117,7 @@ export default function SearchVideos({ resetSearch, searchTerm }) {
           </div>
         </div>
       ) : (
-        <div>No videos found</div>
+        <div className='noResults'><h2>No videos found</h2></div>
       )}
     </>
   )

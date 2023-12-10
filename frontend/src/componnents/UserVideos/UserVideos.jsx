@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./userVideos.css"
 
@@ -8,6 +9,7 @@ import VideoCard from '../videoCard/VideoCard';
 import EditIcon from '../MenuIcon/EditIcon';
 
 export default function UserVideos({ username, resetVideos }) {
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [videoId, setVideoId] = useState();
   const [page, setPage] = useState(0);
@@ -61,7 +63,7 @@ export default function UserVideos({ username, resetVideos }) {
         videos.length > 0 ? (
           <div className="userVideos">
             {videos.map((video, index) => (
-              <div className='userVideosCardContainer' key={index}>
+              <div onClick={() => navigate("/videoplayer/" + video.videoId)} className='userVideosCardContainer' key={index}>
                 <div className='videoCard' ref={videos.length === index + 1 ? lastVideoRef : null}>
                   <VideoCard videoData={video} />
                 </div>
@@ -110,7 +112,7 @@ export default function UserVideos({ username, resetVideos }) {
             </div>
           </div>
         ) : (
-          <h2>You have no videos</h2>
+          <div className='noResults'> <h2>You have no videos</h2></div>
         )
       }
     </>

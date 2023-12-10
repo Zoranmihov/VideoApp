@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, json } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import React, { useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -28,39 +28,29 @@ function App() {
 
   const resetSearch = () => {
     setSearchKey(prevKey => prevKey + 1);
-};
+  };
 
 
-   useEffect(() => {
-  /* Set automated login */
-   axios.post('https://localhost:8443/auth/login', { username: "superAdmin", password: "password" }, { withCredentials: true }).then(res => {
-     setUser(res.data)
-     setLoading(false)
-   }).catch(err => {
-     console.log(err)
-     setLoading(false)
-   })
+  useEffect(() => {
+    axios.post('https://localhost:8443/auth/userinfo', {}, {
+      withCredentials: true,
+    }).then(res => {
+      setUser(res.data)
+      setLoading(false)
+    }).catch(err => {
+      console.log(err)
+      setUser({})
+      setLoading(false)
+    })
 
-
-  axios.post('https://localhost:8443/auth/userinfo', {}, {
-    withCredentials: true,
-  }).then(res => {
-    setUser(res.data)
-    setLoading(false)
-  }).catch(err => {
-    console.log(err)
-    setUser({})
-    setLoading(false)
-  })
-
-    }, []);
+  }, []);
 
   return (
     <>
       {loading ? (<Loading />) : (
         <>
           <BrowserRouter>
-          <Nav user={user} setUser={setUser} />
+            <Nav user={user} setUser={setUser} />
             <Routes>
               <Route index element={<Index />} />
               <Route path='/videoplayer/:videoId' element={<VideoPlayer />} />

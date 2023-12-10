@@ -43,3 +43,10 @@ font-family: 'Roboto', sans-serif;;
   cursor: pointer;
   margin-right: 6px;
 }
+
+.noResults {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+}

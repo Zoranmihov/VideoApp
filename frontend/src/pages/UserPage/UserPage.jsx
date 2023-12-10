@@ -77,6 +77,7 @@ export default function UserPage() {
       <div id='userPageVideos'>
         {videos && videos.length > 0 ? (
           videos.map((video, index) => {
+            video.uploadedAt = video.timestamp;
             if (videos.length === index + 1) {
               // The last video card gets the ref for infinite scrolling
               return <div className='userPageVideoCard' ref={lastVideoRef} key={video.id}><VideoCard videoData={video} /></div>
@@ -85,8 +86,8 @@ export default function UserPage() {
             }
           })
         ) : (
-          <p>No videos to display</p>
-        )}
+          <div className='noResults'><h2>User doesn't have any videos</h2></div>
+          )}
       </div>
     </div>
   )
